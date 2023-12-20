@@ -1,0 +1,115 @@
+version: '3'
+
+services:
+    watchtower:
+        image: containrrr/watchtower
+        container_name: watchtower
+        hostname: watchtower
+        restart: always
+        environment:
+            - WATCHTOWER_POLL_INTERVAL=3600 # update every hour to prevent hitting docker hub's limit
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+    nginx:
+        image: nginx:stable-alpine
+        container_name: nginx
+        hostname: nignx
+        networks:
+            dockercloud:
+        restart: always
+        command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+        ports:
+            - "80:80"
+            - "443:443"
+            - "8443:8443" # testing port
+        volumes:
+            - /home/ubuntu/docker/volumes/nginx/etc/nginx/conf.d:/etc/nginx/conf.d
+            - /home/ubuntu/docker/volumes/certbot/etc/letsencrypt:/etc/letsencrypt
+            - /home/ubuntu/docker/volumes/certbot/var/www/certbot:/var/www/certbot
+    certbot:
+        image: certbot/certbot
+        container_name: certbot
+        hostname: certbot
+        restart: always
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+        volumes:
+            - /home/ubuntu/docker/volumes/certbot/etc/letsencrypt:/etc/letsencrypt
+            - /home/ubuntu/docker/volumes/certbot/var/www/certbot:/var/www/certbot
+
+    mariadb:
+        image: mariadb:10.5
+        container_name: mariadb # only available when deploying using docker-compose
+        hostname: mariadb
+        networks:
+            dockercloud:
+                aliases:
+                    - mariadb
+                    - db
+                    - mysql
+                    - mysqldb
+        command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+        restart: always
+        environment:
+            - MYSQL_ROOT_PASSWORD=wow_secure_pass
+        volumes:
+            - /home/ubuntu/docker/volumes/mariadb/var/lib/mysql:/var/lib/mysql
+
+    redis:
+        image: redis
+        container_name: redis
+        hostname: redis
+        networks:
+            dockercloud:
+                aliases:
+                    - redis
+        restart: unless-stopped
+
+    adminer:
+        image: adminer
+        container_name: adminer
+        hostname: adminer
+        networks:
+            dockercloud:
+                aliases:
+                    - adminer
+        restart: unless-stopped
+        depends_on:
+            - mariadb
+        environment:
+            - ADMINER_DEFAULT_SERVER=mariadb
+        volumes:
+            - /home/ubuntu/docker/volumes/adminer/var/www/html/adminer.css:/var/www/html/adminer.css
+
+    nextcloud:
+        image: nextcloud:production # production = stable - 1
+        container_name: nextcloud # only available when deploying using docker-compose
+        hostname: nextcloud
+        networks:
+            dockercloud:
+                aliases:
+                    - nextcloud
+        restart: unless-stopped
+        depends_on:
+            - mariadb
+            - redis
+        environment:
+            - MYSQL_HOST=mariadb
+            - MYSQL_USER=nextcloud
+            - MYSQL_PASSWORD=wow_secure_pass
+            - MYSQL_DATABASE=nextcloud
+            - REDIS_HOST=redis
+        volumes:
+            - /home/ubuntu/docker/volumes/nextcloud/var/www/html:/var/www/html
+
+    express_server:
+        build: express_server
+        container_name: express_server
+        hostname: express_server
+        networks:
+            dockercloud:
+        restart: always
+        ports:
+            - "8080:8080"
+
+networks:
+    dockercloud:

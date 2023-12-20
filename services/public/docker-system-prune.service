@@ -1,0 +1,15 @@
+[Unit]
+Description=Clean the system of any unused Docker images, containers, networks, etc.
+
+# TODO: if BindsTo is defined, do we need to define Requires?
+Requires=docker.service
+BindsTo=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker system prune -f
+
+[Install]
+WantedBy=multi-user.target
+

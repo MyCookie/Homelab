@@ -1,0 +1,17 @@
+[Unit]
+Description=Once a day clean the system of any unused Docker images, containers, networks, etc.
+
+# TODO: if BindsTo is defined, do we need to define Requires?
+Requires=docker.service
+BindsTo=docker.service
+After=docker.service
+
+[Timer]
+Unit=docker-system-prune.service
+OnCalendar=daily
+AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target
+

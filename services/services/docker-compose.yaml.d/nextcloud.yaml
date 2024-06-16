@@ -1,0 +1,51 @@
+version: '3'
+
+include:
+  - networks/nextcloud.yaml
+
+services:
+  nextcloud:
+    image: nextcloud:production # production = stable - 1
+    container_name: nextcloud # only available when deploying using docker-compose
+    hostname: nextcloud
+    networks:
+      - nextcloud
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+    volumes:
+      - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
+
+  nextcloud_cron:
+    image: nextcloud:production
+    container_name: nextcloud-cron
+    hostname: nextcloud-cron
+    networks:
+      - nextcloud
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+    entrypoint: /cron.sh
+    volumes:
+      - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb # only available when deploying using docker-compose
+    hostname: mariadb
+    networks:
+      - nextcloud
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
+    restart: always
+    volumes:
+      - $VOLUMES_PATH/mariadb/var/lib/mysql:/var/lib/mysql
+
+  redis:
+    image: redis
+    container_name: redis
+    hostname: redis
+    networks:
+      - nextcloud
+    restart: unless-stopped

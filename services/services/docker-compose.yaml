@@ -1,0 +1,25 @@
+version: '3'
+
+include:
+  - docker-compose.yaml.d/networks/nextcloud.yaml
+  - docker-compose.yaml.d/nextcloud.yaml
+  - docker-compose.yaml.d/localai.yaml
+  - docker-compose.yaml.d/youtubedl-material.yaml
+
+services:
+  caddy:
+    image: caddy
+    restart: unless-stopped
+    container_name: caddy
+    depends_on:
+      - nextcloud
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      # we're going to use tailscale from the host system
+      # NOT SCALABLE OR HA
+      - /run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock
+      # for the cloudflare origin ca
+      - $VOLUMES_PATH/caddy/etc/ssl/$DOMAIN_URL:/etc/ssl/$DOMAIN_URL
+      - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile

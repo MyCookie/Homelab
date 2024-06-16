@@ -1,0 +1,22 @@
+# podman run -interactive --tty --detach --name youtubedl-material --restart always --publish "17442:17442" --volume /pool/services/volumes/youtubedl-material/appdata:/app/appdata --volume /pool/services/volumes/youtubedl-material/audio:/app/audio --volume /pool/services/volumes/youtubedl-material/video:/app/video --volume /pool/services/volumes/youtubedl-material/subscriptions:/app/subscriptions --volume /pool/services/volumes/youtubedl-material/users:/app/users --env "WRITE_YTDL_CONFIG=true" docker.io/tzahi12345/youtubedl-material
+version: '3'
+
+include:
+  - networks/nextcloud.yaml
+
+services:
+  youtubedl:
+    image: tzahi12345/youtubedl-material
+    container_name: youtubedl
+    hostname: youtubedl
+    restart: unless-stopped
+    environment:
+      - WRITE_YTDL_CONFIG=true
+    networks:
+      - nextcloud
+    volumes:
+      - $VOLUMES_PATH/youtubedl-material/appdata:/app/appdata
+      - $VOLUMES_PATH/youtubedl-material/audio:/app/audio
+      - $VOLUMES_PATH/youtubedl-material/video:/app/video
+      - $VOLUMES_PATH/youtubedl-material/subscriptions:/app/subscriptions
+      - $VOLUMES_PATH/youtubedl-material/users:/app/users

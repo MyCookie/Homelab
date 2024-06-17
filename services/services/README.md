@@ -66,15 +66,64 @@ Add `--innodb-read-only-compressed=OFF` to the `command` directive in Docker. Se
 
 ### Synapse
 
-todo document homeserver.yaml
+Before starting Synapse, generate the `homeserver.yaml` first:
+
+```bash
+docker run --interactive --tty --rm --mount type=volume,src=$VOLUMES_PATH/data,dst=/data --env SYNAPSE_SERVER_NAME=matrix.$DOMAIN_URL --env SYNAPSE_REPORT_STATS={yes/no} matrixdotorg/synapse generate
+```
+
+#### Delegation
+There are two reasons to use delegation:
+1. While serving Synapse on a subdomain, show a user as `@user:domain.tld` instead of `@user:matrix.domain.tld` inside clients:
+    - `/.well-known/matrix/client` should return HTTP code 200 and `{"m.homeserver": {"base_url": "https://matrix.$DOMAIN_URL"}}`
+2. By default, servers communicate over port `8448`, by using delegation, we can force servers to send their REST calls to another port, say `443`:
+    - `/.well-known/matrix/server` should return HTTP code 200 and `{"m.server": "matrix.$DOMAIN_URL:443}`
+
+The Caddyfile contains these directives.
 
 #### Postgres 12
 
-todo document creating synapse user and table
+By default the Postgres Docker image makes a `postgres` admin user. Use `docker exec --interactive --tty --user postgres synapsedb $COMMAND` to work with the database.
+
+To setup and convert Synapse from SQLite to Postgres:
+
+1. Create the `synapse` user:
+    ```bash
+    docker exec -it -u postgres synapsedb createuser --pwprompt synapse
+    ```
+   Enter the password when prompted.
+2. Create the `synapse` database:
+    ```bash
+    docker exec -it -u postgres synapsedb createdb --encoding=UTF8 --locale=C --template=template0 --owner=synapse synapse
+    ```
+3. Copy the existing `homeserver.yaml` to `homeserver.postgres.yaml` and edit its database section:
+   ```yaml
+   database:
+      name: psycopg2
+      args:
+        user: synapse
+        password: $SYNAPSE_USER_PASS
+        dbname: synapse
+        host: synapsedb
+        cp_min: 5
+        cp_max: 10
+   ```
+4. Migrate the entries using
+    ```bash
+    docker exec -it synapse synapse_port_db --sqlite-database /data/homeserver.db --postgres-config homeserver.postgres.yaml
+    ```
+5. Replace the SQLite `homeserver.yaml` with `homeserver.postgres.yaml`, optionally keeping the original.
+
+Sometimes, depending on the version of Synapse you started with, you may need to fix some keys. The SQL required will be posted in the error logs when Synapse fails to start.
 
 #### Users
 
-todo document user management
+To add a new user from the console:
+```bash
+docker exec -it synapse register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml
+```
+
+TODO: enable user registration.
 
 ### YoutubeDL-Material
 

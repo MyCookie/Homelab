@@ -20,6 +20,8 @@ No extra configuration required.
 
 ## Docker
 
+The Compose directives use a named network. This stack isn't running in a swarm, so the network directive isn't strictly necessary, only a nice-to-have.
+
 See `.env` and change the paths as necessary.
 
 ### Caddy
@@ -30,9 +32,15 @@ Caddy needs to proxy the `.well-known` parameters, see the Caddyfile.
 
 #### Caddyfile
 
-To format the Caddyfile inside its container: `docker exec -it caddy /bin/sh -c "caddy fmt --overwrite /etc/caddy/Caddyfile"`.
+To format the Caddyfile inside its container:
+```bash
+docker exec -it caddy caddy fmt --overwrite /etc/caddy/Caddyfile
+```
 
-To reload Caddy after any changes inside its container: `docker exec -it caddy /bin/sh -c "caddy reload --config /etc/caddy/Caddyfile"`.
+To reload Caddy after any changes inside its container:
+```bash
+docker exec -it caddy caddy reload --config /etc/caddy/Caddyfile
+```
 
 ### Nextcloud
 
@@ -42,17 +50,25 @@ Use `production` which is usually a release behind `latest`.
 
 Use `cron.php` located in `/var/www/html` for background tasks.
 
-When deployed using a single-instance Docker container, setup a second container which only calls `cron.php`. The one-liner would look like: `docker run --interactive --tty --detach --name cron --restart unless-stopped --entrypoint="/var/www/html/cron.php" --volume $HOME/volumes/nextcloud/var/www/html:/var/www/html nextcloud:production`.
+When deployed using a single-instance Docker container, setup a second container which only calls `cron.php`. For example:
+```bash
+docker run --interactive --tty --detach --name cron --restart unless-stopped --entrypoint="/var/www/html/cron.php" --volume $HOME/volumes/nextcloud/var/www/html:/var/www/html nextcloud:production
+```
 
 #### Backup
 
-Since we're on TrueNAS, we'll rely on ZFS snapshots to facilitate backups. See also MinIO, below.
+Since we're on TrueNAS, we'll rely on ZFS snapshots to facilitate backups. ZFS snapshots will capture the entire ZVOL image. And by using MinIO, we can setup bucket goverence policies that keep the object even after it's modified or deleted. A good default is 30 days.
 
 [Documentation](https://docs.nextcloud.com/server/stable/admin_manual/maintenance/backup.html).
 
 #### OCC
 
-Invoke OCC with the `www-data` user. For Docker: `docker exec --interactive --tty --user www-data nextcloud /bin/bash`. This will drop you in `/var/www/html` inside the container, from which you can invoke `php occ $COMMAND`.
+Calling `docker exec` with the `www-data` user will drop you in the `/var/www/html` folder:
+```bash
+docker exec --interactive --tty --user www-data nextcloud php occ $COMMAND
+```
+
+`php occ maintenance:mode --on` will prevent any scripts and tasks from running in the container.
 
 [Documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/occ_command.html).
 
@@ -75,15 +91,24 @@ docker run --interactive --tty --rm --mount type=volume,src=$VOLUMES_PATH/data,d
 #### Delegation
 There are two reasons to use delegation:
 1. While serving Synapse on a subdomain, show a user as `@user:domain.tld` instead of `@user:matrix.domain.tld` inside clients:
-    - `/.well-known/matrix/client` should return HTTP code 200 and `{"m.homeserver": {"base_url": "https://matrix.$DOMAIN_URL"}}`
+    - `/.well-known/matrix/client` should return HTTP code 200 and
+        ```yaml
+        {"m.homeserver": {"base_url": "https://matrix.$DOMAIN_URL"}}
+        ```
 2. By default, servers communicate over port `8448`, by using delegation, we can force servers to send their REST calls to another port, say `443`:
-    - `/.well-known/matrix/server` should return HTTP code 200 and `{"m.server": "matrix.$DOMAIN_URL:443}`
+    - `/.well-known/matrix/server` should return HTTP code 200 and
+        ```yaml
+        {"m.server": "matrix.$DOMAIN_URL:443"}
+        ```
 
 The Caddyfile contains these directives.
 
 #### Postgres 12
 
-By default the Postgres Docker image makes a `postgres` admin user. Use `docker exec --interactive --tty --user postgres synapsedb $COMMAND` to work with the database.
+By default the Postgres Docker image makes a `postgres` admin user. To work with the database:
+```bash
+docker exec --interactive --tty --user postgres synapsedb $COMMAND
+```
 
 To setup and convert Synapse from SQLite to Postgres:
 
@@ -131,11 +156,15 @@ Basic install. See [here](https://github.com/ytdl-org/youtube-dl-material) for m
 
 ### Ollama
 
-Basic docker install, no CUDA.
+Basic docker install, no CUDA. Does not provide an OpenAI/ChatGPT-compatible API for Nextcloud.
+
+```bash
+docker run --interactive --tty --detach --restart unless-stopped --name ollama --hostname ollama --volume $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama ollama/ollama
+```
 
 ### LocalAI
 
-TODO.
+TODO. Very heavy, very black-box. Possibly replace with LightLLM, combined with Ollama.
 
 ## MinIO
 

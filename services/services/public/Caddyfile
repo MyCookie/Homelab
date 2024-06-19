@@ -1,30 +1,3 @@
-nextcloud.{$TAILNET}.ts.net {
-    # for nextcloud
-    redir /.well-known/carddav /remote.php/dav 301
-    redir /.well-known/caldav /remote.php/dav 301
-
-    # for synapse
-    header /.well-known/matrix/* Content-Type application/json
-    header /.well-known/matrix/* Access-Control-Allow-Origin *
-    respond /.well-known/matrix/server `{"m.server": "nextcloud.{$TAILNET}.ts.net:8008"}`
-    respond /.well-known/matrix/client `{"m.homeserver":{"base_url":"https://nextcloud.{$TAILNET}.ts.net:8008"}}`
-
-    reverse_proxy nextcloud
-}
-
-# Synapse
-nextcloud.{$TAILNET}.ts.net:8008 {
-    # inside the tailnet it's safe to proxy all paths
-    reverse_proxy http://synapse:8008
-}
-
-# YoutubeDL-Material
-nextcloud.{$TAILNET}.ts.net:17442 {
-    reverse_proxy youtubedl:17442
-}
-
-# this is for the public-facing domain
-
 # define a named match for caddy to filter
 @nextcloudlogin path /login* /login/*
 

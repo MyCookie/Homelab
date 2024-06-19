@@ -17,10 +17,11 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 17442:17442 # youtubedl
     volumes:
+      - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile
       # we're going to use tailscale from the host system
       # NOT SCALABLE OR HA
       - /run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock
       # for the cloudflare origin ca
       - $VOLUMES_PATH/caddy/etc/ssl/$DOMAIN_URL:/etc/ssl/$DOMAIN_URL
-      - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile

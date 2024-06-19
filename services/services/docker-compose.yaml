@@ -1,4 +1,4 @@
-version: '3'
+name: services
 
 include:
   - docker-compose.yaml.d/networks/nextcloud.yaml

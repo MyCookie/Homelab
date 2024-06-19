@@ -1,93 +1,184 @@
-# homelab
+# Nextcloud
 
+...and other services.
 
+[[_TOC_]]
 
-## Getting started
+## Debian
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Install `docker.io`, `docker-compose` from `stable`. Optinally, add user to group `docker` for ease-of-use.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### TrueNAS
 
-## Add your files
+VNC resolution 800x600.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+After installing, go back into recovery mode in the ISO, and install GRUB on the "removable" ESP.
 
+### Tailscale
+
+No extra configuration required.
+
+## Docker
+
+The Compose directives use a named network. This stack isn't running in a swarm, so the network directive isn't strictly necessary, only a nice-to-have.
+
+See `.env` and change the paths as necessary.
+
+### Caddy
+
+Caddy takes care of getting Let's Encrypt certificates using `tailscaled` over its socket.
+
+Caddy needs to proxy the `.well-known` parameters, see the Caddyfile.
+
+#### Caddyfile
+
+To format the Caddyfile inside its container:
+```bash
+docker exec -it caddy caddy fmt --overwrite /etc/caddy/Caddyfile
 ```
-cd existing_repo
-git remote add origin http://gitlab.TAILNET.ts.net/ashish/homelab.git
-git branch -M main
-git push -uf origin main
+
+To reload Caddy after any changes inside its container:
+```bash
+docker exec -it caddy caddy reload --config /etc/caddy/Caddyfile
 ```
 
-## Integrate with your tools
+### Nextcloud
 
-- [ ] [Set up project integrations](http://gitlab.TAILNET.ts.net/ashish/homelab/-/settings/integrations)
+Use `production` which is usually a release behind `latest`.
 
-## Collaborate with your team
+#### Background Tasks
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Use `cron.php` located in `/var/www/html` for background tasks.
 
-## Test and Deploy
+When deployed using a single-instance Docker container, setup a second container which only calls `cron.php`. For example:
+```bash
+docker run --interactive --tty --detach --name cron --restart unless-stopped --entrypoint="/var/www/html/cron.php" --volume $HOME/volumes/nextcloud/var/www/html:/var/www/html nextcloud:production
+```
 
-Use the built-in continuous integration in GitLab.
+#### Backup
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Since we're on TrueNAS, we'll rely on ZFS snapshots to facilitate backups. ZFS snapshots will capture the entire ZVOL image. And by using MinIO, we can setup bucket goverence policies that keep the object even after it's modified or deleted. A good default is 30 days.
 
-***
+[Documentation](https://docs.nextcloud.com/server/stable/admin_manual/maintenance/backup.html).
 
-# Editing this README
+#### OCC
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+Calling `docker exec` with the `www-data` user will drop you in the `/var/www/html` folder:
+```bash
+docker exec --interactive --tty --user www-data nextcloud php occ $COMMAND
+```
 
-## Suggestions for a good README
+`php occ maintenance:mode --on` will prevent any scripts and tasks from running in the container.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+[Documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/occ_command.html).
 
-## Name
-Choose a self-explaining name for your project.
+### MariaDB
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+10.11 is tagged as LTS, and is supported until February 2028.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+#### MariaDB >10.5
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Add `--innodb-read-only-compressed=OFF` to the `command` directive in Docker. See [here](https://help.nextcloud.com/t/new-setup-docker-compose-not-working/115673/12) for the discussion.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Synapse
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Before starting Synapse, generate the `homeserver.yaml` first:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```bash
+docker run --interactive --tty --rm --mount type=volume,src=$VOLUMES_PATH/data,dst=/data --env SYNAPSE_SERVER_NAME=matrix.$DOMAIN_URL --env SYNAPSE_REPORT_STATS={yes/no} matrixdotorg/synapse generate
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+#### Delegation
+There are two reasons to use delegation:
+1. While serving Synapse on a subdomain, show a user as `@user:domain.tld` instead of `@user:matrix.domain.tld` inside clients:
+    - `/.well-known/matrix/client` should return HTTP code 200 and
+        ```yaml
+        {"m.homeserver": {"base_url": "https://matrix.$DOMAIN_URL"}}
+        ```
+2. By default, servers communicate over port `8448`, by using delegation, we can force servers to send their REST calls to another port, say `443`:
+    - `/.well-known/matrix/server` should return HTTP code 200 and
+        ```yaml
+        {"m.server": "matrix.$DOMAIN_URL:443"}
+        ```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+The Caddyfile contains these directives.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+#### Postgres 12
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+By default the Postgres Docker image makes a `postgres` admin user. To work with the database:
+```bash
+docker exec --interactive --tty --user postgres synapsedb $COMMAND
+```
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+To setup and convert Synapse from SQLite to Postgres:
 
-## License
-For open source projects, say how it is licensed.
+1. Create the `synapse` user:
+    ```bash
+    docker exec -it -u postgres synapsedb createuser --pwprompt synapse
+    ```
+   Enter the password when prompted.
+2. Create the `synapse` database:
+    ```bash
+    docker exec -it -u postgres synapsedb createdb --encoding=UTF8 --locale=C --template=template0 --owner=synapse synapse
+    ```
+3. Copy the existing `homeserver.yaml` to `homeserver.postgres.yaml` and edit its database section:
+   ```yaml
+   database:
+      name: psycopg2
+      args:
+        user: synapse
+        password: $SYNAPSE_USER_PASS
+        dbname: synapse
+        host: synapsedb
+        cp_min: 5
+        cp_max: 10
+   ```
+4. Migrate the entries using
+    ```bash
+    docker exec -it synapse synapse_port_db --sqlite-database /data/homeserver.db --postgres-config homeserver.postgres.yaml
+    ```
+5. Replace the SQLite `homeserver.yaml` with `homeserver.postgres.yaml`, optionally keeping the original.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Sometimes, depending on the version of Synapse you started with, you may need to fix some keys. The SQL required will be posted in the error logs when Synapse fails to start.
+
+#### Users
+
+To add a new user from the console:
+```bash
+docker exec -it synapse register_new_matrix_user http://localhost:8008 -c /data/homeserver.yaml
+```
+
+TODO: enable user registration.
+
+### YoutubeDL-Material
+
+Basic install. See [here](https://github.com/ytdl-org/youtube-dl-material) for more information.
+
+### Ollama
+
+Basic docker install, no CUDA. Does not provide an OpenAI/ChatGPT-compatible API for Nextcloud.
+
+```bash
+docker run --interactive --tty --detach --restart unless-stopped --name ollama --hostname ollama --volume $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama ollama/ollama
+```
+
+### LocalAI
+
+TODO. Very heavy, very black-box. Possibly replace with LightLLM, combined with Ollama.
+
+## MinIO
+
+Self-hosted S3 clone. Using S3 primary storage separates the data from the VM running Nextcloud. Allows ZFS to snapshot and clone data separately from the VM.
+
+By default, the TrueNAS plugin of MinIO exposes port 9001 for its API, and 9002 for the web console. Inside the jail, the ports are upstream's default: 9000 for the API, and 9001 for the web console.
+
+### Tailscale
+
+When building the jail, make sure to check `allow_tun`. Install `tailscale` using `pkg`.
+
+While inside the jail, the API port is 9000 and the web console port is 9001.
+
+### Security
+
+#### Policies
+When setting policies, the declaration must also specify any children as well. For example, `arn:aws:s3:::nextcloud` only grants the policies to the bucket `nextcloud`, but not its children. In order to grant access to its children as well, the policy must apply to `arn:aws:s3:::nextcloud/*`. `nextcloud*` also works, but also grants access to buckets that start with `nextcloud[...]`.

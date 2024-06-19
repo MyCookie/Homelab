@@ -1,10 +1,10 @@
 name: nextcloud
 
 include:
-  - docker-compose.yaml.d/networks/nextcloud.yaml
-  - docker-compose.yaml.d/nextcloud.yaml
-  - docker-compose.yaml.d/localai.yaml
-  - docker-compose.yaml.d/youtubedl-material.yaml
+  - services/networks/nextcloud.yaml
+  - services/nextcloud.yaml
+  - services/localai.yaml
+  - services/youtubedl-material.yaml
 
 services:
   caddy:

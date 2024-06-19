@@ -166,6 +166,15 @@ docker run --interactive --tty --detach --restart unless-stopped --name ollama -
 
 TODO. Very heavy, very black-box. Possibly replace with LightLLM, combined with Ollama.
 
+### Gitlab
+
+To get the root password in the first 24 hours of image creation:
+```bash
+docker exec --interactive --tty gitlab grep 'Password:' /etc/gitlab/initial_root_password
+```
+
+See the [documentation](https://docs.gitlab.com/ee/install/docker.html).
+
 ## MinIO
 
 Self-hosted S3 clone. Using S3 primary storage separates the data from the VM running Nextcloud. Allows ZFS to snapshot and clone data separately from the VM.

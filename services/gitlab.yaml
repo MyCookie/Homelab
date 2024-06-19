@@ -1,0 +1,33 @@
+include:
+  - networks/nextcloud.yaml
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce
+    name: gitlab
+    hostname: gitlab
+    networks:
+      - nextcloud
+    restart: unless-stopped
+    ports:
+      - 22:22
+      - 80:80
+    volumes:
+      - $VOLUMES_PATH/gitlab/var/opt/gitlab:/var/opt/gitlab
+      - $VOLUMES_PATH/gitlab/etc/gitlab:/etc/gitlab
+      - $VOLUMES_PATH/gitlab/var/log/gitlab:/var/log/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.TAILNET.ts.net'
+    shm_size: '256mb'
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    name: gitlab-runner
+    hostname: gitlabrunner
+    networks:
+      - nextcloud
+    restart: unless-stopped
+    volumes:
+      - $VOLUMES_PATH/gitlab-runner/etc/gitlab-runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock

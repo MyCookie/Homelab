@@ -1,4 +1,4 @@
-name: services
+name: nextcloud
 
 include:
   - docker-compose.yaml.d/networks/nextcloud.yaml
@@ -13,6 +13,7 @@ services:
     container_name: caddy
     depends_on:
       - nextcloud
+      - youtubedl
     ports:
       - 80:80
       - 443:443

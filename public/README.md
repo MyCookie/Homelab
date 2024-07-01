@@ -15,3 +15,7 @@ Documentation for Caddy: https://caddyserver.com/docs/install.
 Replace `DOMAIN_NAME` and `TAILNET_NAME` from `../.env` in the `Caddyfile`. Copy the `Caddyfile` to `/etc/caddy`.
 
 Copy Cloudflare's Origin CA certificates to `/etc/caddy/ssl/$DOMAIN_URL`.
+
+#### `reverse_proxy` directive
+
+When proxying to HTTPS, set the `Host` header to the domain name of the HTTPS server. See [here](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https).

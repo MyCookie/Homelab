@@ -15,15 +15,33 @@ cloud.DOMAIN_NAME {
 
     # we don't want anyone logging in from outside the tailnet
     # define a named match for caddy to filter
-    @nextcloudlogin path /login* /login/*
+    @nextcloudlogin path /login* /login/* /index.php/login /index.php/login/* /ocs/v1.php /ocs/v1.php/* /ocs/v2.php /ocs/v2.php/*
     respond @nextcloudlogin 403
 
-    reverse_proxy https://nextcloud.TAILNET_NAME.ts.net
+    reverse_proxy https://nextcloud.TAILNET_NAME.ts.net {
+        # when proxying to https on a different domain, change the Host header
+        # so that SNI provides the appropriate response
+        # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+        header_up Host nextcloud.TAILNET_NAME.ts.net
+        header_down Host cloud.DOMAIN_NAME
+    }
 }
 
 matrix.DOMAIN_NAME {
     tls /etc/ssl/DOMAIN_NAME/DOMAIN_NAME.cert.pem /etc/ssl/DOMAIN_NAME/DOMAIN_NAME.key.pem
 
-    reverse_proxy /_matrix/* https://nextcloud.TAILNET_NAME.ts.net:8008
-    reverse_proxy /_synapse/client/* https://nextcloud.TAILNET_NAME.ts.net:8008
+    reverse_proxy /_matrix/* https://nextcloud.TAILNET_NAME.ts.net:8008 {
+        # when proxying to https on a different domain, change the Host header
+        # so that SNI provides the appropriate response
+        # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+        header_up Host nextcloud.TAILNET_NAME.ts.net
+        header_down Host matrix.DOMAIN_NAME
+    }
+    reverse_proxy /_synapse/client/* https://nextcloud.TAILNET_NAME.ts.net:8008 {
+        # when proxying to https on a different domain, change the Host header
+        # so that SNI provides the appropriate response
+        # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+        header_up Host nextcloud.TAILNET_NAME.ts.net
+        header_down Host matrix.DOMAIN_NAME
+    }
 }

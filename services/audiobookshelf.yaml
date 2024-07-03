@@ -1,0 +1,18 @@
+include:
+  - networks/nextcloud.yaml
+
+services:
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    restart: unless-stopped
+    networks:
+      - nextcloud
+    hostname: audiobookshelf
+    volumes:
+      - $VOLUMES_PATH/audiobookshelf/audiobooks:/audiobooks
+      - $VOLUMES_PATH/audiobookshelf/podcasts:/podcasts
+      - $VOLUMES_PATH/audiobookshelf/config:/config
+      - $VOLUMES_PATH/audiobookshelf/metadata:/metadata
+    environment:
+      - TZ=America/Edmonton

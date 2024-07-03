@@ -1,0 +1,14 @@
+include:
+  - networks/nextcloud.yaml
+
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:ollama
+    container_name: open-webui
+    restart: unless-stopped
+    networks:
+      - nextcloud
+    hostname: openwebui
+    volumes:
+      - $VOLUMES_PATH/open-webui/app/backend/data:/app/backend/data
+      - $VOLUMES_PATH/ollama/data:/root/.ollama

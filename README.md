@@ -85,7 +85,7 @@ Add `--innodb-read-only-compressed=OFF` to the `command` directive in Docker. Se
 Before starting Synapse, generate the `homeserver.yaml` first:
 
 ```bash
-docker run --interactive --tty --rm --mount type=volume,src=$VOLUMES_PATH/data,dst=/data --env SYNAPSE_SERVER_NAME=matrix.$DOMAIN_URL --env SYNAPSE_REPORT_STATS={yes/no} matrixdotorg/synapse generate
+docker run --interactive --tty --rm --mount type=volume,src=$VOLUMES_PATH/data,dst=/data --env SYNAPSE_SERVER_NAME=$DOMAIN_URL --env SYNAPSE_REPORT_STATS={yes/no} matrixdotorg/synapse generate
 ```
 
 #### Delegation

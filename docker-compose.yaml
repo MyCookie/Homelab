@@ -2,8 +2,10 @@ name: nextcloud
 
 include:
   - services/networks/nextcloud.yaml
+  - services/gitea.yaml
   - services/nextcloud.yaml
-  - services/localai.yaml
+  - services/openwebui.yaml
+  - services/synapse.yaml
   - services/youtubedl-material.yaml
 
 services:
@@ -12,11 +14,15 @@ services:
     restart: unless-stopped
     container_name: caddy
     depends_on:
+      - gitea
       - nextcloud
+      - synapse
       - youtubedl
     ports:
       - 80:80
       - 443:443
+      - 3000:3000 # gitea
+      - 8008:8008 # synapse
       - 17442:17442 # youtubedl
     volumes:
       - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile

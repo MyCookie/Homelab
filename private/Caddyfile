@@ -1,3 +1,6 @@
+# https://caddyserver.com/docs/caddyfile/directives/import
+import ./Caddyfile.d/*
+
 nextcloud.TAILNET_NAME.ts.net {
     # for nextcloud
     redir /.well-known/carddav /remote.php/dav 301
@@ -10,15 +13,4 @@ nextcloud.TAILNET_NAME.ts.net {
     respond /.well-known/matrix/client `{"m.homeserver":{"base_url":"https://nextcloud.TAILNET_NAME.ts.net:8008"}}`
 
     reverse_proxy nextcloud
-}
-
-# Synapse
-nextcloud.TAILNET_NAME.ts.net:8008 {
-    # inside the tailnet it's safe to proxy all paths
-    reverse_proxy http://synapse:8008
-}
-
-# YoutubeDL-Material
-nextcloud.TAILNET_NAME.ts.net:17442 {
-    reverse_proxy youtubedl:17442
 }

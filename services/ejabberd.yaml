@@ -1,0 +1,16 @@
+include:
+  - networks/nextcloud.yaml
+
+services:
+  ejabberd:
+    image: ghcr.io/processone/ejabberd
+    container_name: ejabberd
+    hostname: ejabberd
+    networks:
+      - nextcloud
+    restart: unless-stopped
+    volumes:
+      - $VOLUMES_PATH/ejabberd/opt/ejabberd/conf:/opt/ejabberd/conf
+      - $VOLUMES_PATH/ejabberd/opt/ejabberd/database:/opt/ejabberd/database
+      - $VOLUMES_PATH/ejabberd/opt/ejabberd/logs:/opt/ejabberd/logs
+      - $VOLUMES_PATH/ejabberd/opt/ejabberd/upload:/opt/ejabberd/upload

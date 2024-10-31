@@ -14,16 +14,13 @@ services:
     restart: unless-stopped
     container_name: caddy
     depends_on:
-      - gitea
       - nextcloud
-      - synapse
-      - youtubedl
     ports:
-      - 80:80
-      - 443:443
-      - 3000:3000 # gitea
-      - 8008:8008 # synapse
-      - 17442:17442 # youtubedl
+      - "80:80"
+      - "443:443"
+      - "3000:3000" # forgejo
+      - "8080:8080" # open-webui
+      - "9000-9001:9000-90001" # minio
     volumes:
       - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile
       # we're going to use tailscale from the host system

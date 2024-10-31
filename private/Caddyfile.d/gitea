@@ -1,4 +1,4 @@
-# services/gitea.yaml
+# services/nextcloud.yaml
 
 nextcloud.TAILNET_NAME.ts.net:3000 {
 	reverse_proxy gitea:3000

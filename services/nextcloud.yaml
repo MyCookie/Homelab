@@ -29,6 +29,23 @@ services:
     volumes:
       - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
 
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:7
+    container_name: forgejo
+    restart: unless-stopped
+    hostname: forgejo
+    networks:
+      - nextcloud
+    ports:
+      - "8022:22"
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - $VOLUMES_PATH/forgejo/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
   mariadb:
     image: mariadb:10.11
     container_name: mariadb # only available when deploying using docker-compose

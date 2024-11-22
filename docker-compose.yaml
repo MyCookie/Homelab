@@ -2,11 +2,9 @@ name: nextcloud
 
 include:
   - services/networks/nextcloud.yaml
-  - services/gitea.yaml
   - services/nextcloud.yaml
+  - services/ollama.yaml
   - services/openwebui.yaml
-  - services/synapse.yaml
-  - services/youtubedl-material.yaml
 
 services:
   caddy:

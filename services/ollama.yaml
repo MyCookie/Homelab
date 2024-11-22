@@ -10,4 +10,4 @@ services:
     networks:
       - nextcloud
     volumes:
-      - $VOLUMES_PATH/ollama/data:/root/.ollama
+      - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama

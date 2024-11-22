@@ -11,6 +11,6 @@ services:
     hostname: openwebui
     volumes:
       - $VOLUMES_PATH/open-webui/app/backend/data:/app/backend/data
-      - $VOLUMES_PATH/ollama/data:/root/.ollama
+      - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
     environment:
       - OLLAMA_BASE_URL=http://localhost:11434

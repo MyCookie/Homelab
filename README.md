@@ -141,6 +141,16 @@ To setup and convert Synapse from SQLite to Postgres:
 
 Sometimes, depending on the version of Synapse you started with, you may need to fix some keys. The SQL required will be posted in the error logs when Synapse fails to start.
 
+#### Upgrading Postgres
+
+Use the docker image `pgautoupgrade/pgautoupgrade:$PG_VERSION-alpine`.
+
+```bash
+docker run --name pgautoupgrade -it --mount type=bind,source=/data/volumes/postgres/data,target=/var/lib/postgresql/data -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e PGAUTO_ONESHOT=yes pgautoupgrade/pgautoupgrade:13-alpine
+```
+
+TODO: fill in more detail.
+
 #### Users
 
 To add a new user from the console:

@@ -201,3 +201,103 @@ While inside the jail, the API port is 9000 and the web console port is 9001.
 
 #### Policies
 When setting policies, the declaration must also specify any children as well. For example, `arn:aws:s3:::nextcloud` only grants the policies to the bucket `nextcloud`, but not its children. In order to grant access to its children as well, the policy must apply to `arn:aws:s3:::nextcloud/*`. `nextcloud*` also works, but also grants access to buckets that start with `nextcloud[...]`.
+
+## Reverse Proxy
+
+Add an additonal reverse proxy in front of Caddy running in the container. This abstracts away the internal tailnet for traffic coming from the wider internet.
+
+### Caddy
+
+Bog-standard Caddy install. Prefer to use the binary from the distribution's repository. Since this instance will handle TLS termination for internet-wide traffic, no special install or setup is necessary.
+
+### TLS
+
+We can use Caddy's internal Let's Encrypt toolchain to automatically get a certificate. For Cloudflare, grab the Origin CA associated with the account, and put it somewhere Caddy can read. For example: `/etc/ssl/$DOMAIN_URL/$DOMAIN_URL.${cert|key}.pem`.
+
+### TLS Host Header
+
+When reverse proxying to a server using HTTPS with a differnt domain, if we do not change the headers, the browser will refuse to connect, as will any other proxies. When running a site served over HTTPS on a tailnet, this is the case. In order to solve this, we will need to manage the Host header when passing traffic through the proxy. An example is provided below.
+
+```Caddyfile
+matrix.$DOMAIN_URL {
+	tls /etc/ssl/$DOMAIN_URL/$DOMAIN_URL.cert.pem /etc/ssl/$DOMAIN_URL/$DOMAIN_URL.key.pem
+
+	reverse_proxy /_matrix/* https://matrix.$TAILNET.ts.net:8008 {
+        # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+		# when proxying to https on a different domain, switch the header for SNI
+		header_up Host matrix.$TAILNET.ts.net
+		header_down Host matrix.$DOMAIN_URL
+    }
+	reverse_proxy /_synapse/client/* https://matrix.$TAILNET.ts.net:8008 {
+        # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+		# when proxying to https on a different domain, switch the header for SNI
+		header_up Host matrix.$TAILNET.ts.net
+		header_down Host matrix.$DOMAIN_URL
+    }
+
+	log {
+		output file /var/log/caddy/$DOMAIN_URL/matrix/caddy.log
+	}
+}
+```
+
+See https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https for more details.
+
+### Logging
+
+Add the `log` directive to each proxied site. The location is arbitrary, as long as Caddy can write to it.
+
+```Caddyfile
+log {
+	output file /var/log/caddy/$DOMAIN_URL/caddy.log
+}
+```
+
+Add the subdomain after the parent domain in the above example to separate the logs by site.
+
+### Matrix
+
+For domain delegation, see #Delegation. An example is provided below:
+
+```Caddyfile
+header /.well-known/matrix/* Content-Type application/json
+header /.well-known/matrix/* Access-Control-Allow-Origin *
+respond /.well-known/matrix/server `{"m.server": "matrix.$DOMAIN_URL:443"}`
+respond /.well-known/matrix/client `{"m.homeserver":{"base_url":"https://matrix.$DOMAIN_URL"}}`
+```
+
+### Troubleshooting
+
+#### Tailscale DNS issues
+
+There are multiple services fighting over `/etc/resolve.conf` in a Linux machine. Until all services adopt a single DNS resolver, this mess will continue.
+
+This issue will appear as an inability to access sites even if the proxy is connected to Tailscale.
+
+You have this issue when:
+
+- You CAN:
+-- See a successful `tailscale status`.
+-- Successfully `tailscale ping` a node.
+-- Successfully `ping $TAILNET_NODE_IP` a node.
+-- Successfully get a `NOERROR` on `dig ts.net` or resolve an IP with `nslookup ts.net`.
+- You CAN NOT:
+-- Successfully `curl $TAILNET_NODE_HOSTNAME`.
+-- Successfully get a `NOERROR` on `dig $TAILNET_NODE_HOSTNAME.$TAILNET.ts.net`
+
+For machines with `systemd-resolved`, use `resolvectl` to see the available networks and their attached DNS servers. A failed config will return:
+
+```bash
+user@host$ resolvectl
+Link 3 (tailscale0)
+    Current Scopes: none
+         Protocols: -DefaultRoute -LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+```
+
+To attempt to resolve this issue with `resolvectl`, run:
+
+```bash
+# resolvectl dns tailscale0 100.100.100.100
+# resolvectl domain tailscale0 ts.net
+# systemctl restart systemd-resolved
+```

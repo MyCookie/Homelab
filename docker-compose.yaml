@@ -2,11 +2,17 @@ name: nextcloud
 
 include:
   - services/networks/nextcloud.yaml
+  - services/networks/servarr.yaml
   - services/nextcloud.yaml
   - services/ollama.yaml
   - services/openwebui.yaml
+  - services/servarr.yaml
 
 services:
+  # This caddy instance exists to expose nextcloud with a valid certificate
+  # from let's encrypt using the hosts tailscale daemon.
+  # More a legacy than a feature. Nonetheless, this will allow nextcloud to
+  # work even if tsdproxy fails.
   caddy:
     image: caddy
     restart: unless-stopped
@@ -17,12 +23,23 @@ services:
       - "80:80"
       - "443:443"
       - "3000:3000" # forgejo
-      - "8080:8080" # open-webui
       - "9000-9001:9000-90001" # minio
     volumes:
       - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile
       # we're going to use tailscale from the host system
       # NOT SCALABLE OR HA
       - /run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock
-      # for the cloudflare origin ca
-      - $VOLUMES_PATH/caddy/etc/ssl/$DOMAIN_URL:/etc/ssl/$DOMAIN_URL
+
+  # TODO tsdproxy
+  # https://almeidapaulopt.github.io/tsdproxy/
+  tsdproxy:
+    image: almeidapaulopt/tsdproxy:1
+    container_name: tsdproxy
+    hostname: tsdproxy
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $VOLUMES_PATH/tsdproxy/data:/data
+      - $VOLUMES_PATH/tsdproxy/config:/config
+    ports:
+      - "8080:8080"

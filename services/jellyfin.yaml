@@ -1,0 +1,18 @@
+include:
+  - networks/nextcloud.yaml
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: no
+    hostname: jellyfin
+    networks:
+      - nextcloud
+    volumes:
+      - $VOLUMES_PATH/jellyfin/cache:/cache
+      - $VOLUMES_PATH/jellyfin/config:/config
+      - type: bind
+        source: $MEDIA_PATH
+        target: $MEDIA_PATH
+        read_only: true

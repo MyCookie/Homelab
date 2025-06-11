@@ -1,0 +1,3 @@
+networks:
+  servarr:
+    name: servarr

@@ -1,0 +1,85 @@
+{
+   "CapAdd" : null,
+   "CapDrop" : null,
+   "cmd" : "postgres",
+   "cpu_priority" : 50,
+   "enable_publish_all_ports" : false,
+   "enable_restart_policy" : false,
+   "enable_service_portal" : null,
+   "enabled" : true,
+   "env_variables" : [
+      {
+         "key" : "PATH",
+         "value" : "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      {
+         "key" : "GOSU_VERSION",
+         "value" : "1.17"
+      },
+      {
+         "key" : "LANG",
+         "value" : "en_US.utf8"
+      },
+      {
+         "key" : "PG_MAJOR",
+         "value" : "13"
+      },
+      {
+         "key" : "PG_VERSION",
+         "value" : "13.18"
+      },
+      {
+         "key" : "PG_SHA256",
+         "value" : "ceea92abee2a8c19408d278b68de6a78b6bd3dbb4fa2d653fa7ca745d666aab1"
+      },
+      {
+         "key" : "DOCKER_PG_LLVM_DEPS",
+         "value" : "llvm19-dev \t\tclang19"
+      },
+      {
+         "key" : "PGDATA",
+         "value" : "/var/lib/postgresql/data"
+      }
+   ],
+   "exporting" : false,
+   "id" : "c564625c1ff71f029cbd7a10c1c13cce2a834011a77a1bd4ecc03c60e9e60c39",
+   "image" : "postgres:13-alpine",
+   "is_ddsm" : false,
+   "is_package" : false,
+   "labels" : {},
+   "links" : [],
+   "memory_limit" : 0,
+   "name" : "synapsedb",
+   "network" : [
+      {
+         "driver" : "bridge",
+         "name" : "synapse"
+      }
+   ],
+   "network_mode" : "synapse",
+   "port_bindings" : [
+      {
+         "container_port" : 5432,
+         "host_port" : 0,
+         "type" : "tcp"
+      }
+   ],
+   "privileged" : false,
+   "service_portals" : [],
+   "shortcut" : {
+      "enable_shortcut" : false,
+      "enable_status_page" : false,
+      "enable_web_page" : false,
+      "web_page_url" : ""
+   },
+   "use_host_network" : false,
+   "version" : 2,
+   "volume_bindings" : [
+      {
+         "host_volume_file" : "/docker/volumes/postgres/data",
+         "is_directory" : true,
+         "mount_point" : "/var/lib/postgresql/data",
+         "type" : "rw"
+      }
+   ]
+}

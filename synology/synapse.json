@@ -1,0 +1,107 @@
+{
+   "CapAdd" : null,
+   "CapDrop" : null,
+   "cmd" : "",
+   "cpu_priority" : 50,
+   "enable_publish_all_ports" : false,
+   "enable_restart_policy" : false,
+   "enable_service_portal" : null,
+   "enabled" : true,
+   "env_variables" : [
+      {
+         "key" : "PATH",
+         "value" : "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      {
+         "key" : "LANG",
+         "value" : "C.UTF-8"
+      },
+      {
+         "key" : "GPG_KEY",
+         "value" : "A035C8C19219BA821ECEA86B64E628F8D684696D"
+      },
+      {
+         "key" : "PYTHON_VERSION",
+         "value" : "3.11.9"
+      },
+      {
+         "key" : "PYTHON_PIP_VERSION",
+         "value" : "24.0"
+      },
+      {
+         "key" : "PYTHON_SETUPTOOLS_VERSION",
+         "value" : "65.5.1"
+      },
+      {
+         "key" : "PYTHON_GET_PIP_URL",
+         "value" : "https://github.com/pypa/get-pip/raw/66d8a0f637083e2c3ddffc0cb1e65ce126afb856/public/get-pip.py"
+      },
+      {
+         "key" : "PYTHON_GET_PIP_SHA256",
+         "value" : "6fb7b781206356f45ad79efbb19322caa6c2a5ad39092d0d44d0fec94117e118"
+      },
+      {
+         "key" : "PYTHON_SHA256",
+         "value" : "7220835d9f90b37c006e9842a8dff4580aaca4318674f947302b8d28f3f81112"
+      }
+   ],
+   "exporting" : false,
+   "id" : "1f6aaac23c6e03ca3c58f0b9e1f734476409d1e87b33326a499324ec4f22f029",
+   "image" : "matrixdotorg/synapse:latest",
+   "is_ddsm" : false,
+   "is_package" : false,
+   "labels" : {
+      "gitsha1" : "5eec67b6ef4b76caa2324a80e01e361bfa84a929",
+      "org.opencontainers.image.documentation" : "https://github.com/element-hq/synapse/blob/master/docker/README.md",
+      "org.opencontainers.image.licenses" : "AGPL-3.0-or-later",
+      "org.opencontainers.image.source" : "https://github.com/element-hq/synapse.git",
+      "org.opencontainers.image.url" : "https://matrix.org/docs/projects/server/synapse",
+      "org.opencontainers.image.version" : "1.114.0"
+   },
+   "links" : [],
+   "memory_limit" : 0,
+   "name" : "synapse",
+   "network" : [
+      {
+         "driver" : "bridge",
+         "name" : "synapse"
+      }
+   ],
+   "network_mode" : "synapse",
+   "port_bindings" : [
+      {
+         "container_port" : 8008,
+         "host_port" : 8008,
+         "type" : "tcp"
+      },
+      {
+         "container_port" : 8009,
+         "host_port" : 0,
+         "type" : "tcp"
+      },
+      {
+         "container_port" : 8448,
+         "host_port" : 0,
+         "type" : "tcp"
+      }
+   ],
+   "privileged" : false,
+   "service_portals" : [],
+   "services" : null,
+   "shortcut" : {
+      "enable_shortcut" : false,
+      "enable_status_page" : false,
+      "enable_web_page" : false,
+      "web_page_url" : ""
+   },
+   "use_host_network" : false,
+   "version" : 2,
+   "volume_bindings" : [
+      {
+         "host_volume_file" : "/docker/volumes/synapse/data",
+         "is_directory" : true,
+         "mount_point" : "/data",
+         "type" : "rw"
+      }
+   ]
+}

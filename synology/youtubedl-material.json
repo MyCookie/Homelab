@@ -1,0 +1,119 @@
+{
+   "CapAdd" : null,
+   "CapDrop" : null,
+   "cmd" : "npm start",
+   "cpu_priority" : 0,
+   "enable_publish_all_ports" : false,
+   "enable_restart_policy" : true,
+   "enable_service_portal" : null,
+   "enabled" : false,
+   "env_variables" : [
+      {
+         "key" : "PATH",
+         "value" : "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      },
+      {
+         "key" : "UID",
+         "value" : "1000"
+      },
+      {
+         "key" : "GID",
+         "value" : "1000"
+      },
+      {
+         "key" : "USER",
+         "value" : "youtube"
+      },
+      {
+         "key" : "NO_UPDATE_NOTIFIER",
+         "value" : "true"
+      },
+      {
+         "key" : "PM2_HOME",
+         "value" : "/app/pm2"
+      },
+      {
+         "key" : "ALLOW_CONFIG_MUTATIONS",
+         "value" : "true"
+      },
+      {
+         "key" : "WRITE_YTDL_CONFIG",
+         "value" : "true"
+      }
+   ],
+   "exporting" : false,
+   "id" : "b69aa55f63a0933cbfe0ce4267756e721a3531afd376405adeec4eee6fc5283c",
+   "image" : "tzahi12345/youtubedl-material:latest",
+   "is_ddsm" : false,
+   "is_package" : false,
+   "labels" : {
+      "org.opencontainers.image.created" : "2023-05-27T06:39:19.872Z",
+      "org.opencontainers.image.description" : "Self-hosted YouTube downloader built on Material Design",
+      "org.opencontainers.image.licenses" : "MIT",
+      "org.opencontainers.image.ref.name" : "ubuntu",
+      "org.opencontainers.image.revision" : "13a03a722c565b7fb21bf8977765e5968afc4a0d",
+      "org.opencontainers.image.source" : "https://github.com/Tzahi12345/YoutubeDL-Material",
+      "org.opencontainers.image.title" : "YoutubeDL-Material",
+      "org.opencontainers.image.url" : "https://github.com/Tzahi12345/YoutubeDL-Material",
+      "org.opencontainers.image.version" : "4.3.2"
+   },
+   "links" : [],
+   "memory_limit" : 0,
+   "name" : "youtubedl-material",
+   "network" : [
+      {
+         "driver" : "bridge",
+         "name" : "bridge"
+      }
+   ],
+   "network_mode" : "bridge",
+   "port_bindings" : [
+      {
+         "container_port" : 17442,
+         "host_port" : 17442,
+         "type" : "tcp"
+      }
+   ],
+   "privileged" : false,
+   "service_portals" : [],
+   "shortcut" : {
+      "enable_shortcut" : false,
+      "enable_status_page" : false,
+      "enable_web_page" : false,
+      "web_page_url" : ""
+   },
+   "use_host_network" : false,
+   "version" : 2,
+   "volume_bindings" : [
+      {
+         "host_volume_file" : "/docker/volumes/youtubedl-material/appdata",
+         "is_directory" : true,
+         "mount_point" : "/app/appdata",
+         "type" : "rw"
+      },
+      {
+         "host_volume_file" : "/docker/volumes/youtubedl-material/audio",
+         "is_directory" : true,
+         "mount_point" : "/app/audio",
+         "type" : "rw"
+      },
+      {
+         "host_volume_file" : "/docker/volumes/youtubedl-material/subscriptions",
+         "is_directory" : true,
+         "mount_point" : "/app/subscriptions",
+         "type" : "rw"
+      },
+      {
+         "host_volume_file" : "/docker/volumes/youtubedl-material/users",
+         "is_directory" : true,
+         "mount_point" : "/app/users",
+         "type" : "rw"
+      },
+      {
+         "host_volume_file" : "/docker/volumes/youtubedl-material/video",
+         "is_directory" : true,
+         "mount_point" : "/app/video",
+         "type" : "rw"
+      }
+   ]
+}

@@ -1,8 +1,13 @@
+include:
+  - networks/nextcloud.yaml
+
 services:
   synapse:
     image: matrixdotorg/synapse
     container_name: synapse
     hostname: synapse
+    networks:
+      - nextcloud
     restart: unless-stopped
     depends_on:
       - synapsedb
@@ -10,9 +15,11 @@ services:
       - $VOLUMES_PATH/synapse/data:/data
 
   synapsedb:
-    image: postgres:12-alpine
+    image: postgres:13-alpine
     container_name: postgres
     hostname: synapsedb
+    networks:
+      - nextcloud
     restart: always
     environment:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD

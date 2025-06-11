@@ -1,5 +1,5 @@
 include:
-  - networks/nextcloud.yaml
+  - networks/tsdproxy.yaml
 
 services:
   openwebui:
@@ -7,8 +7,19 @@ services:
     container_name: open-webui
     restart: unless-stopped
     networks:
-      - nextcloud
+      - tsdproxy
     hostname: openwebui
+    ports:
+      - 8888:8080
+    labels:
+      - tsdproxy.enable: "true"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
     volumes:
       - $VOLUMES_PATH/open-webui/app/backend/data:/app/backend/data
       - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama

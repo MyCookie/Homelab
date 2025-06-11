@@ -9,6 +9,13 @@ services:
     networks:
       - nextcloud
     restart: no
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
     depends_on:
       - ollama
       - mariadb
@@ -85,6 +92,13 @@ services:
     restart: unless-stopped
     networks:
       - nextcloud
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
     volumes:
       - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
 

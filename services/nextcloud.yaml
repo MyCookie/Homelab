@@ -8,7 +8,7 @@ services:
     hostname: nextcloud
     networks:
       - nextcloud
-    restart: unless-stopped
+    restart: no
     depends_on:
       - mariadb
       - redis
@@ -21,7 +21,7 @@ services:
     hostname: nextcloud-cron
     networks:
       - nextcloud
-    restart: unless-stopped
+    restart: no
     depends_on:
       - mariadb
       - redis
@@ -32,7 +32,7 @@ services:
   forgejo:
     image: codeberg.org/forgejo/forgejo:7
     container_name: forgejo
-    restart: unless-stopped
+    restart: no
     hostname: forgejo
     networks:
       - nextcloud
@@ -51,7 +51,7 @@ services:
 
   minio:
     image: quay.io/minio/minio
-    restart: always
+    restart: unless-stopped
     container_name: minio
     command: 'server /data --console-address ":9001"'
     healthcheck:
@@ -76,7 +76,7 @@ services:
     networks:
       - nextcloud
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
-    restart: always
+    restart: unless-stopped
     volumes:
       - $VOLUMES_PATH/mariadb/var/lib/mysql:/var/lib/mysql
 
@@ -87,3 +87,11 @@ services:
     networks:
       - nextcloud
     restart: unless-stopped
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: unless-stopped
+    hostname: adminer
+    networks:
+      - nextcloud

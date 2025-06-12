@@ -6,11 +6,5 @@ nextcloud.TAILNET_NAME.ts.net {
     redir /.well-known/carddav /remote.php/dav 301
     redir /.well-known/caldav /remote.php/dav 301
 
-    # for synapse
-    header /.well-known/matrix/* Content-Type application/json
-    header /.well-known/matrix/* Access-Control-Allow-Origin *
-    respond /.well-known/matrix/server `{"m.server": "nextcloud.TAILNET_NAME.ts.net:8008"}`
-    respond /.well-known/matrix/client `{"m.homeserver":{"base_url":"https://nextcloud.TAILNET_NAME.ts.net:8008"}}`
-
     reverse_proxy nextcloud
 }

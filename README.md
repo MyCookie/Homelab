@@ -308,6 +308,50 @@ docker exec --interactive --tty gitlab grep 'Password:' /etc/gitlab/initial_root
 
 See the [documentation](https://docs.gitlab.com/ee/install/docker.html).
 
+### Pruning
+
+Most of this functionality is now part of Watchtower when running with the `WATCHTOWER_CLEANUP` and `WATCHTOWER_CLEANUP_VOLUMES` environment variables passed. The units are left in this document for reference.
+
+`docker-system-prune.service`:
+
+```systemd
+[Unit]
+Description=Clean the system of any unused Docker images, containers, networks, etc.
+
+# TODO: if BindsTo is defined, do we need to define Requires?
+Requires=docker.service
+BindsTo=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker system prune -f
+
+[Install]
+WantedBy=multi-user.target
+```
+
+`docker-system-prune.timer`:
+
+```systemd
+[Unit]
+Description=Once a day clean the system of any unused Docker images, containers, networks, etc.
+
+# TODO: if BindsTo is defined, do we need to define Requires?
+Requires=docker.service
+BindsTo=docker.service
+After=docker.service
+
+[Timer]
+Unit=docker-system-prune.service
+OnCalendar=daily
+AccuracySec=1h
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## MinIO
 
 Self-hosted S3 clone. Using S3 primary storage separates the data from the VM running Nextcloud. Allows ZFS to snapshot and clone data separately from the VM.

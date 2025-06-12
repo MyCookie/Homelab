@@ -26,7 +26,7 @@ services:
       - "9000-9001:9000-90001" # minio
       - "13378:13378" # audiobookshelf
     volumes:
-      - $VOLUMES_PATH/caddy/etc/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - $VOLUMES_PATH/caddy/etc/caddy:/etc/caddy
       # we're going to use tailscale from the host system
       # NOT SCALABLE OR HA
       - /run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock

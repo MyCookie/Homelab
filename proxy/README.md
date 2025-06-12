@@ -67,7 +67,7 @@ Add the subdomain after the parent domain in the above example to separate the l
 
 ### Matrix
 
-For domain delegation, see ../prod/README.md#Docker#Synapse#Delegation. An example is provided below:
+For domain delegation, see ../docker/README.md#Docker#Synapse#Delegation. An example is provided below:
 
 ```Caddyfile
 header /.well-known/matrix/* Content-Type application/json

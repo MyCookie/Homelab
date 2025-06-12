@@ -1,7 +1,7 @@
 # https://caddyserver.com/docs/caddyfile/directives/import
 import ./Caddyfile.d/*
 
-nextcloud.TAILNET.ts.net {
+nextcloud.TAILNET_NAME.ts.net {
     # for synapse
     header /.well-known/matrix/* Content-Type application/json
     header /.well-known/matrix/* Access-Control-Allow-Origin *

@@ -2,8 +2,8 @@
 
 # load our variables
 # https://gist.github.com/mihow/9c7f559807069a03e302605691f85572
-if [ ! -f .env ]; then
-    export $(cat .env | xargs)
+if [ ! -f prod/services/env/nextcloud.env ]; then
+    export $(cat prod/services/env/nextcloud.env | xargs)
 fi
 
 CADDYFILE_PATH="$VOLUMES_PATH/caddy/etc/caddy"
@@ -25,9 +25,9 @@ else
     # fi
 fi
 
-# check for docker-compose
-if [ ! which docker-compose ]; then
-    echo "docker-compose not found!"
+# check for docker-compose-plugin
+if [ ! dpkg-query -W -f='${Status}' docker-compose-plugin | grep -q -E 'install ok installed' ]; then
+    echo "Compose pulgin not installed!"
     FAIL_STATE=1
 fi
 
@@ -35,12 +35,11 @@ if [ FAIL_STATE -eq 1 ]; then
     return
 fi
 
-# TODO: build both private and public caddyfiles
-# build the private caddyfile
+# build the caddyfile
 if [ ! -f $VOLUMES_PATH/caddy/etc/caddy/Caddyfile ]; then
     mkdir -p $CADDYFILE_PATH
 
-    cp private/Caddyfile $CADDYFILE
+    cp -r prod/volumes/caddy/etc/caddy/* $CADDYFILE_PATH/
 
     # replace the vars in the caddyfile with the vars in env
     sed -i -e "s/TAILNET_NAME/$TAILNET/g" $CADDYFILE
@@ -50,7 +49,7 @@ else
 fi
 
 if id -nG ${whoami} | grep -qw "docker"; then
-    docker-compose up -d
+    docker compose up -d
 else
-    sudo docker-compose up -d
+    sudo docker compose up -d
 fi

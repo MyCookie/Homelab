@@ -1,6 +1,9 @@
 include:
   - networks/nextcloud.yaml
 
+env_file:
+  - env/nextcloud.env
+
 services:
   nextcloud:
     image: nextcloud:30
@@ -18,6 +21,7 @@ services:
               capabilities: [gpu]
     depends_on:
       - ollama
+      - minio
       - mariadb
       - redis
     volumes:
@@ -30,7 +34,15 @@ services:
     networks:
       - nextcloud
     restart: no
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
     depends_on:
+      - minio
       - mariadb
       - redis
     entrypoint: /cron.sh

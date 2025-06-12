@@ -1,6 +1,9 @@
 include:
   - networks/nextcloud.yaml
 
+env_file:
+  - env/nextcloud.env
+
 services:
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest

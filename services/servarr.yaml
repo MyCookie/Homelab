@@ -1,9 +1,22 @@
+name: servarr
+
 include:
   - networks/servarr.yaml
+
+env_file:
+  - env/nextcloud.env
+  - env/servarr.env
 
 services:
   # This follow hotio's guides for setting up 'arrs in docker
   # https://hotio.dev/
+
+  # This also follows the owner and permissions guidelines from the servarr wiki
+  # https://wiki.servarr.com/docker-guide#multiple-users-and-a-shared-group
+  # On the host, create the group servarr with the GID 960:
+  # groupadd --gid 960 servarr
+  # For each 'arr, create it's user that belongs to the servarr group:
+  # useradd --no-user-group -M --groups servarr --uid $ARR_UID $ARR_USER
 
   # The base image is the exit node for services in the stack, and the node through
   # which we access the various webuis
@@ -32,7 +45,7 @@ services:
       - UMASK=002
       - TZ=America/Edmonton # Better to keep this as TZ/Utc?
       - VPN_ENABLED=true
-      - VPN_CONF=wg0 # This file should be in $VOLUMES_PATH/servarr/config/wireguard/wg0.conf
+      - VPN_CONF=wg0 # This file points to $VOLUMES_PATH/servarr/config/wireguard/wg0.conf
       - VPN_PROVIDER=generic
       - VPN_LAN_NETWORK=192.168.1.0/24
       - VPN_LAN_LEAK_ENABLED=false
@@ -57,6 +70,8 @@ services:
     volumes:
       - $VOLUMES_PATH/servarr/config:/config
 
+  # We won't be creating a user, instead we'll make sure the umask is set so the
+  # various 'arrs can read the files downloaded
   qbittorrent:
     image: ghcr.io/hotio/qbittorrent
     container_name: qbittorrent
@@ -93,6 +108,7 @@ services:
     volumes:
       - $VOLUMES_PATH/prowlarr/config:/config
 
+  # Create the user radarr with UID 965
   radarr:
     image: ghcr.io/hotio/radarr
     container_name: radarr
@@ -108,8 +124,10 @@ services:
       - TZ=America/Edmonton
     volumes:
       - $VOLUMES_PATH/radarr/config:/config
-      - $MEDIA_PATH/video:$MEDIA_PATH/video
+      - $MEDIA_PATH/video/Downloads:$MEDIA_PATH/video/Downloads:ro
+      - $MEDIA_PATH/video/Library/Movies:$MEDIA_PATH/video/Library/Movies
 
+  # Create the user sonarr with the UID 964
   sonarr:
     image: ghcr.io/hotio/sonarr
     container_name: sonarr
@@ -125,4 +143,5 @@ services:
       - TZ=America/Edmonton
     volumes:
       - $VOLUMES_PATH/sonarr/config:/config
-      - $MEDIA_PATH/video:$MEDIA_PATH/video
+      - $MEDIA_PATH/video/Downloads:$MEDIA_PATH/video/Downloads:ro
+      - $MEDIA_PATH/video/Library/TV:$MEDIA_PATH/video/Library/TV

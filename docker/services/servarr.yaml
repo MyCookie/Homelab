@@ -89,7 +89,7 @@ services:
       # leave this in since it doesn't really do anything
       - WEBUI_PORTS=8080/tcp,8080/udp
     volumes:
-      - $VOLUMES_PATH/config:/config
+      - $VOLUMES_PATH/qbittorrent/config:/config
       - $MEDIA_PATH:$MEDIA_PATH
 
   prowlarr:

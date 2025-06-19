@@ -183,6 +183,15 @@ While inside the jail, the API port is 9000 and the web console port is 9001.
 #### Policies
 When setting policies, the declaration must also specify any children as well. For example, `arn:aws:s3:::nextcloud` only grants the policies to the bucket `nextcloud`, but not its children. In order to grant access to its children as well, the policy must apply to `arn:aws:s3:::nextcloud/*`. `nextcloud*` also works, but also grants access to buckets that start with `nextcloud[...]`.
 
+## Jellyfin
+
+### Nvidia
+
+To enable transcoding, install the container toolkit, as well as the required packages for NVENC/NVDEC.
+
+```bash
+apt install --no-install-recommends libnvidia-encode1
+```
 
 ## Gitlab
 

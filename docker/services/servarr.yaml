@@ -89,8 +89,18 @@ services:
       # leave this in since it doesn't really do anything
       - WEBUI_PORTS=8080/tcp,8080/udp
     volumes:
-      - $VOLUMES_PATH/qbittorrent/config:/config
-      - $MEDIA_PATH:$MEDIA_PATH
+      - type: bind
+        source: $VOLUMES_PATH/qbittorrent/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH_ARR_BT
+        target: $DOWNLOAD_PATH_ARR_BT
+        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH_BT
+        target: $DOWNLOAD_PATH_BT
+        read_only: false
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr
@@ -106,7 +116,10 @@ services:
       - UMASK=002
       - TZ=America/Edmonton
     volumes:
-      - $VOLUMES_PATH/prowlarr/config:/config
+      - type: bind
+        source: $VOLUMES_PATH/prowlarr/config
+        target: /config
+        read_only: false
 
   # Create the user radarr with UID 965
   radarr:
@@ -123,9 +136,18 @@ services:
       - UMASK=002
       - TZ=America/Edmonton
     volumes:
-      - $VOLUMES_PATH/radarr/config:/config
-      - $MEDIA_PATH/video/Downloads:$MEDIA_PATH/video/Downloads:ro
-      - $MEDIA_PATH/video/Library/Movies:$MEDIA_PATH/video/Library/Movies
+      - type: bind
+        source: $VOLUMES_PATH/radarr/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH_ARR
+        target: $DOWNLOAD_PATH_ARR
+        read_only: true
+      - type: bind
+        source: $LIBRARY_PATH_MOVIES
+        target: $LIBRARY_PATH_MOVIES
+        read_only: false
 
   # Create the user sonarr with the UID 964
   sonarr:
@@ -142,6 +164,15 @@ services:
       - UMASK=002
       - TZ=America/Edmonton
     volumes:
-      - $VOLUMES_PATH/sonarr/config:/config
-      - $MEDIA_PATH/video/Downloads:$MEDIA_PATH/video/Downloads:ro
-      - $MEDIA_PATH/video/Library/TV:$MEDIA_PATH/video/Library/TV
+      - type: bind
+        source: $VOLUMES_PATH/sonarr/config
+        target: /config
+        read_only:false
+      - type: bind
+        source: $DOWNLOAD_PATH_ARR
+        target: $DOWNLOAD_PATH_ARR
+        read_only: true
+      - type: bind
+        source: $LIBRARY_PATH_TV
+        target: $LIBRARY_PATH_TV
+        read_only: false

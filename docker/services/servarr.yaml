@@ -8,7 +8,7 @@ env_file:
   - env/servarr.env
 
 services:
-  # This follow hotio's guides for setting up 'arrs in docker
+  # This follows hotios guides for setting up 'arrs in docker
   # https://hotio.dev/
 
   # This also follows the owner and permissions guidelines from the servarr wiki
@@ -167,7 +167,7 @@ services:
       - type: bind
         source: $VOLUMES_PATH/sonarr/config
         target: /config
-        read_only:false
+        read_only: false
       - type: bind
         source: $DOWNLOAD_PATH_ARR
         target: $DOWNLOAD_PATH_ARR

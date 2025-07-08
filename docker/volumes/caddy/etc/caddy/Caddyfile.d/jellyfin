@@ -1,4 +1,4 @@
 # services/jellyfin.yaml
-nextcloud.TAILNET_NAME.ts.net:8096 {
+homelab.TAILNET_NAME.ts.net:8096 {
 	reverse_proxy jellyfin:8096
 }

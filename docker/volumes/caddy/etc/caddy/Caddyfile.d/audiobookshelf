@@ -1,4 +1,4 @@
 # services/audiobookshelf.yaml
-nextcloud.TAILNET_NAME.ts.net:13378 {
+homelab.TAILNET_NAME.ts.net:13378 {
 	reverse_proxy audiobookshelf:13378
 }

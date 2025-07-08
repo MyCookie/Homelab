@@ -193,6 +193,52 @@ To enable transcoding, install the container toolkit, as well as the required pa
 apt install --no-install-recommends libnvidia-encode1
 ```
 
+## Tailscale
+
+### Caddy with sidecar container
+
+Running a sidecar Tailscale container makes it difficult for Caddy to access the socket to obtain certificates. The Nextcloud AIO discussions page has a [breakdown](https://github.com/nextcloud/all-in-one/discussions/5439) of how to access the sidecar socket.
+
+A simple implementation of the concept:
+
+```yaml
+services:
+  caddy:
+    image: caddy
+    restart: unless-stopped
+    container_name: nextcloud-caddy
+    hostname: nextcloud-caddy
+    # we won't create any config files since our need is very simple
+    entrypoint: ["caddy", "reverse-proxy", "--from", "nextcloud.TAIL_NET.ts.net", "--to", "nextcloud"]
+    depends_on:
+      - nextcloud
+      - tailscale
+    ports:
+      - "443:443"
+    volumes:
+      - type: volume
+        source: tailscale_sock
+        target: /var/run/tailscale/ # Mount the volume for /var/run/tailscale/tailscale.sock
+        read_only: true
+
+  tailscale:
+    image: tailscale/tailscale
+    container_name: tailscale
+    restart: unless-stopped
+    hostname: tailscale
+    environment:
+      - TS_AUTHKEY=TS_CLIENT_SECRET
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - $VOLUMES_PATH/nextcloud_caddy_tailscale/state:/var/lib/tailscale
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+```
+
 ## Gitlab
 
 To get the root password in the first 24 hours of image creation:

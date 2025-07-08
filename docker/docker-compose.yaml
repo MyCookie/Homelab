@@ -19,7 +19,6 @@ services:
       - nextcloud
     ports:
       - "80:80"
-      - "443:443"
       - "3000:3000" # forgejo
       - "8080:8080" # openwebui
       - "8096:8096" # jellyfin

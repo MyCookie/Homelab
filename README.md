@@ -17,6 +17,27 @@ Enable the `contrib` repository. Install from backports:
 ```bash
 apt install -t stable-backports zfsutils-linux linux-headers-amd64
 ```
+> **NOTE** Do not use the `--no-install-recommends` flag when installing this package, as it will not install `zfs-dkms`.
+
+### ARC size
+
+Get the size of the memory pool in bytes with `free --bytes`.
+
+Set the ARC size for each boot with:
+
+```bash
+echo "options zfs zfs_arc_max=$SOME_BYTES" >> /etc/modprobe.d/zfs.conf
+```
+
+Set the ARC size for the current boot with:
+
+```bash
+echo "$SOME_BYTES" > /sys/module/zfs/parameters/zfs_arc_max
+```
+
+`/usr/sbin/arc_summary` presents the ARC stats in a human-readable manner.
+
+See: https://serverfault.com/questions/581669/why-isnt-the-arc-max-setting-honoured-on-zfs-on-linux.
 
 ### Snapshots
 

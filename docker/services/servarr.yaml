@@ -3,10 +3,6 @@ name: servarr
 include:
   - networks/servarr.yaml
 
-env_file:
-  - env/nextcloud.env
-  - env/servarr.env
-
 services:
   # This follows hotios guides for setting up 'arrs in docker
   # https://hotio.dev/
@@ -39,6 +35,8 @@ services:
       - 9696:9696 # prowlarr
       - 7878:7878 # radarr
       - 8989:8989 # sonarr
+    env_file:
+      - env/servarr.env
     environment:
       - PUID=1000
       - PGID=1000
@@ -80,6 +78,8 @@ services:
       - servarr
     # We're using the base image's network stack
     network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
     environment:
       - PUID=1000
       - PGID=1000
@@ -110,6 +110,8 @@ services:
       - servarr
     # We're using the base image's network stack
     network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
     environment:
       - PUID=1000
       - GUID=1000
@@ -129,6 +131,8 @@ services:
       - servarr
     # We're using the base image's network stack
     network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
     environment:
       - PUID=$RADARR_UID
       - GUID=$ARR_GID
@@ -157,6 +161,8 @@ services:
       - servarr
     # We're using the base image's network stack
     network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
     environment:
       - PUID=$SONARR_UID
       - GUID=$ARR_GID

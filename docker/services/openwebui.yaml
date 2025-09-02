@@ -1,9 +1,6 @@
 include:
   - networks/nextcloud.yaml
 
-env_file:
-  - env/nextcloud.env
-
 services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:main

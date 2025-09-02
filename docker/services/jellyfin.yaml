@@ -1,9 +1,6 @@
 include:
   - networks/nextcloud.yaml
 
-env_file:
-  - env/nextcloud.env
-
 services:
   jellyfin:
     image: jellyfin/jellyfin

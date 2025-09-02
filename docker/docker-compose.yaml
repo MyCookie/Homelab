@@ -7,9 +7,6 @@ include:
   - services/ollama.yaml
   - services/openwebui.yaml
 
-env_file:
-  - services/env/nextcloud.env
-
 services:
   caddy:
     image: caddy
@@ -29,3 +26,23 @@ services:
       # we're going to use tailscale from the host system
       # NOT SCALABLE OR HA
       - /run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock
+
+  # Sidecar tailscale to serve Nextcloud over HTTPS
+  ts-nextcloud:
+    image: tailscale/tailscale
+    container_name: ts-nextcloud
+    restart: unless-stopped
+    hostname: nextcloud-tailscale
+    environment:
+      - TS_AUTHKEY=TS_CLIENT_SECRET
+      - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_SERVE_CONFIG=/etc/tailscale/nextcloud.conf
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - $VOLUMES_PATH/nextcloud/var/lib/tailscale:/var/lib/tailscale
+      - $VOLUMES_PATH/tailscale/serve/nextcloud.conf:/etc/tailscale/nextcloud.conf
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin

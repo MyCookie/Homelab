@@ -3,12 +3,13 @@ include:
 
 services:
   openwebui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:ollama
     container_name: open-webui
     restart: unless-stopped
     networks:
       - nextcloud
-    hostname: openwebui
+    ports:
+      - "8080:8080"
     deploy:
       resources:
         reservations:
@@ -19,5 +20,3 @@ services:
     volumes:
       - $VOLUMES_PATH/open-webui/app/backend/data:/app/backend/data
       - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
-    environment:
-      - OLLAMA_BASE_URL=http://localhost:11434

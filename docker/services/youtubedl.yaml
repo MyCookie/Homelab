@@ -1,0 +1,21 @@
+include:
+  - networks/homelab.yaml
+
+services:
+  youtubedl:
+    image: tzahi12345/youtubedl-material
+    container_name: youtubedl
+    hostname: youtubedl
+    restart: unless-stopped
+    networks:
+      - homelab
+    ports:
+      - "17442:17442"
+    environment:
+      - WRITE_YTDL_CONFIG=true
+    volumes:
+      - $VOLUMES_PATH/youtubedl-material/appdata:/app/appdata
+      - $VOLUMES_PATH/youtubedl-material/audio:/app/audio
+      - $VOLUMES_PATH/youtubedl-material/video:/app/video
+      - $VOLUMES_PATH/youtubedl-material/subscriptions:/app/subscriptions
+      - $VOLUMES_PATH/youtubedl-material/users:/app/users

@@ -3,46 +3,26 @@ name: nextcloud
 include:
   - services/networks/nextcloud.yaml
   - services/audiobookshelf.yaml
+  - services/jellyfin.yaml
   - services/nextcloud.yaml
-  - services/ollama.yaml
   - services/openwebui.yaml
+  - services/synapse.yaml
+  - services/youtubedl.yaml
 
 services:
-  caddy:
-    image: caddy
-    restart: unless-stopped
-    container_name: caddy
-    depends_on:
-      - nextcloud
-    ports:
-      - "80:80"
-      - "3000:3000" # forgejo
-      - "8080:8080" # openwebui
-      - "8096:8096" # jellyfin
-      - "9000-9001:9000-90001" # minio
-      - "13378:13378" # audiobookshelf
-    volumes:
-      - $VOLUMES_PATH/caddy/etc/caddy:/etc/caddy
-      # we're going to use tailscale from the host system
-      # NOT SCALABLE OR HA
-      - /run/tailscale/tailscaled.sock:/run/tailscale/tailscaled.sock
-
-  # Sidecar tailscale to serve Nextcloud over HTTPS
-  ts-nextcloud:
+  tailscale:
     image: tailscale/tailscale
-    container_name: ts-nextcloud
+    container_name: tailscale
     restart: unless-stopped
-    hostname: nextcloud-tailscale
-    environment:
-      - TS_AUTHKEY=TS_CLIENT_SECRET
-      - TS_EXTRA_ARGS=--advertise-tags=tag:container
-      - TS_SERVE_CONFIG=/etc/tailscale/nextcloud.conf
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_USERSPACE=false
+    hostname: tailscale
+    networks:
+      - nextcloud
+    env_file: services/env/tailscale.env
     volumes:
-      - $VOLUMES_PATH/nextcloud/var/lib/tailscale:/var/lib/tailscale
-      - $VOLUMES_PATH/tailscale/serve/nextcloud.conf:/etc/tailscale/nextcloud.conf
+      - $VOLUMES_PATH/tailscale/var/lib/tailscale:/var/lib/tailscale
+      - $VOLUMES_PATH/tailscale/etc/tailscale/serve/nextcloud.conf:/etc/tailscale/serve/nextcloud.conf
     devices:
       - /dev/net/tun:/dev/net/tun
     cap_add:
       - net_admin
+      - sys_module

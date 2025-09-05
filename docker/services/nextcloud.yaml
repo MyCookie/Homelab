@@ -5,9 +5,7 @@ services:
   nextcloud:
     image: nextcloud:30
     container_name: nextcloud # only available when deploying using docker-compose
-    hostname: nextcloud
-    networks:
-      - nextcloud
+    network_mode: service:tailscale
     restart: no
     deploy:
       resources:
@@ -21,15 +19,14 @@ services:
       - minio
       - mariadb
       - redis
+      - tailscale
     volumes:
       - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
 
   nextcloud_cron:
     image: nextcloud:30
     container_name: nextcloud-cron
-    hostname: nextcloud-cron
-    networks:
-      - nextcloud
+    network_mode: service:tailscale
     restart: no
     deploy:
       resources:
@@ -42,6 +39,7 @@ services:
       - minio
       - mariadb
       - redis
+      - tailscale
     entrypoint: /cron.sh
     volumes:
       - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
@@ -50,14 +48,14 @@ services:
     image: codeberg.org/forgejo/forgejo:7
     container_name: forgejo
     restart: no
-    hostname: forgejo
     networks:
       - nextcloud
     ports:
-      - 3000:3000
-      - "8022:22"
+      - "3000:3000"
+      - "8022:8022"
     depends_on:
       - mariadb
+      - tailscale
     environment:
       - USER_UID=1000
       - USER_GID=1000
@@ -78,8 +76,6 @@ services:
       retries: 5
     networks:
       - nextcloud
-    ports:
-      - 9000-9001:9000-9001
     volumes:
       - $VOLUMES_PATH/minio/data:/data
 
@@ -87,14 +83,12 @@ services:
     image: adminer
     container_name: adminer
     restart: unless-stopped
-    hostname: adminer
     networks:
       - nextcloud
 
   ollama:
     image: ollama/ollama
     container_name: ollama
-    hostname: ollama
     restart: unless-stopped
     networks:
       - nextcloud
@@ -111,7 +105,6 @@ services:
   mariadb:
     image: mariadb:10.11
     container_name: mariadb # only available when deploying using docker-compose
-    hostname: mariadb
     networks:
       - nextcloud
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
@@ -122,7 +115,6 @@ services:
   redis:
     image: redis
     container_name: redis
-    hostname: redis
     networks:
       - nextcloud
     restart: unless-stopped

@@ -1,5 +1,5 @@
 include:
-  - networks/nextcloud.yaml
+  - networks/homelab.yaml
 
 services:
   audiobookshelf:
@@ -7,8 +7,10 @@ services:
     container_name: audiobookshelf
     restart: unless-stopped
     networks:
-      - nextcloud
+      - homelab
     hostname: audiobookshelf
+    ports:
+      - "13378:80"
     volumes:
       - $VOLUMES_PATH/audiobookshelf/audiobooks:/audiobooks
       - $VOLUMES_PATH/audiobookshelf/podcasts:/podcasts

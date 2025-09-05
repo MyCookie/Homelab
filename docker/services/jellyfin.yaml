@@ -6,9 +6,7 @@ services:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: no
-    hostname: jellyfin
-    networks:
-      - nextcloud
+    network_mode: service:tailscale
     volumes:
       - $VOLUMES_PATH/jellyfin/cache:/cache
       - $VOLUMES_PATH/jellyfin/config:/config

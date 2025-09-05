@@ -1,5 +1,6 @@
 include:
   - networks/nextcloud.yaml
+  - nextclouddb.yaml
 
 services:
   nextcloud:
@@ -43,78 +44,3 @@ services:
     entrypoint: /cron.sh
     volumes:
       - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
-
-  forgejo:
-    image: codeberg.org/forgejo/forgejo:7
-    container_name: forgejo
-    restart: no
-    networks:
-      - nextcloud
-    ports:
-      - "3000:3000"
-      - "8022:22"
-    depends_on:
-      - mariadb
-      - tailscale
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
-    volumes:
-      - $VOLUMES_PATH/forgejo/data:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-
-  minio:
-    image: quay.io/minio/minio
-    restart: unless-stopped
-    container_name: minio
-    command: 'server /data --console-address ":9001"'
-    healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - nextcloud
-    volumes:
-      - $VOLUMES_PATH/minio/data:/data
-
-  adminer:
-    image: adminer
-    container_name: adminer
-    restart: unless-stopped
-    networks:
-      - nextcloud
-
-  ollama:
-    image: ollama/ollama
-    container_name: ollama
-    restart: unless-stopped
-    networks:
-      - nextcloud
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1 # alternatively, use `count: all` for all GPUs
-              capabilities: [gpu]
-    volumes:
-      - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
-
-  mariadb:
-    image: mariadb:10.11
-    container_name: mariadb # only available when deploying using docker-compose
-    networks:
-      - nextcloud
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
-    restart: unless-stopped
-    volumes:
-      - $VOLUMES_PATH/mariadb/var/lib/mysql:/var/lib/mysql
-
-  redis:
-    image: redis
-    container_name: redis
-    networks:
-      - nextcloud
-    restart: unless-stopped

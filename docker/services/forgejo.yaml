@@ -1,0 +1,24 @@
+import:
+  - networks/nextcloud.yaml
+  - nextclouddb.yaml
+
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:7
+    container_name: forgejo
+    restart: no
+    networks:
+      - nextcloud
+    ports:
+      - "3000:3000"
+      - "8022:22"
+    depends_on:
+      - mariadb
+      - tailscale
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - $VOLUMES_PATH/forgejo/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro

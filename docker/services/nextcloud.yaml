@@ -52,7 +52,7 @@ services:
       - nextcloud
     ports:
       - "3000:3000"
-      - "8022:8022"
+      - "8022:22"
     depends_on:
       - mariadb
       - tailscale

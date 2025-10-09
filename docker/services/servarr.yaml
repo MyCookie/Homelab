@@ -124,6 +124,7 @@ services:
         read_only: false
 
   # Create the user radarr with UID $RADARR_UID
+  radarr:
     image: ghcr.io/hotio/radarr
     container_name: radarr
     restart: no

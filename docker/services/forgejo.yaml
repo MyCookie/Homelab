@@ -1,4 +1,4 @@
-import:
+include:
   - networks/nextcloud.yaml
   - nextclouddb.yaml
 

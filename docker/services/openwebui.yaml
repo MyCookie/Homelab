@@ -19,4 +19,4 @@ services:
               capabilities: [gpu]
     volumes:
       - $VOLUMES_PATH/open-webui/app/backend/data:/app/backend/data
-      - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
+      - $VOLUMES_PATH/open-webui/root/.ollama:/root/.ollama

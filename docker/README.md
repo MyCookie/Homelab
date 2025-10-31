@@ -72,6 +72,26 @@ docker exec --interactive --tty --user www-data nextcloud php occ $COMMAND
 
 Add `--innodb-read-only-compressed=OFF` to the `command` directive in Docker. See [here](https://help.nextcloud.com/t/new-setup-docker-compose-not-working/115673/12) for the discussion.
 
+### Troubleshooting
+
+#### Errors in management tables
+
+An example of the error:
+```bash
+2025-10-29  4:51:40 3 [ERROR] Incorrect definition of table mysql.column_stats: expected column 'hist_type' at position 9 to have type enum('SINGLE_PREC_HB','DOUBLE_PREC_HB','JSON_HB'), found type enum('SINGLE_PREC_HB','DOUBLE_PREC_HB').
+2025-10-29  4:51:40 3 [ERROR] Incorrect definition of table mysql.column_stats: expected column 'histogram' at position 10 to have type longblob, found type varbinary(255).
+```
+
+May be caused by partial upgrades of the database. To fix, you will need to stop all processes using the database and run:
+
+```
+# mariadb-upgrade -u root -p -h nextcloud-mariadb
+```
+
+Another (lazy) possible way-since we're using Docker-is to add the environment flag `MARIADB_AUTO_UPGRADE=1` and rebuild the container.
+
+[Nextcloud Talk discussion.](https://help.nextcloud.com/t/incorrect-definition-of-table-mysql-column-stats-expected-column-histogram-at-position-10-to-have-type-longblob-found-type-varbinary-255/145513)
+
 ## Synapse
 
 Before starting Synapse, generate the `homeserver.yaml` first:

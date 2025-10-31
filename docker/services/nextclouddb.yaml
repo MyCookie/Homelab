@@ -47,6 +47,8 @@ services:
       - nextcloud
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
     restart: unless-stopped
+    environment:
+      - MARIADB_AUTO_UPGRADE=0 # disabled by default
     volumes:
       - $VOLUMES_PATH/mariadb/var/lib/mysql:/var/lib/mysql
 

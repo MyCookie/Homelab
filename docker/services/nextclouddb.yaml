@@ -30,13 +30,6 @@ services:
     restart: unless-stopped
     networks:
       - nextcloud
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1 # alternatively, use `count: all` for all GPUs
-              capabilities: [gpu]
     volumes:
       - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
 

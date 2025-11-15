@@ -180,7 +180,22 @@ Basic install. See [here](https://github.com/ytdl-org/youtube-dl-material) for m
 
 ## Ollama
 
-Basic docker install. The Nvidia GPU is exposed for CUDA acceleration.
+Basic docker install. To use an Nvidia GPU for CUDA acceleration, add this:
+
+```yaml
+services:
+  [...]
+  ollama:
+    [...]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
+  [...]
+```
 
 ## LocalAI
 

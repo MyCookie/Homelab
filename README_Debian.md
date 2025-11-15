@@ -1,6 +1,6 @@
 # Debian
 
-This project assumes you're running Debian Stable. As of writing current Stable is [12.11](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.11.0-amd64-netinst.iso).
+This project assumes you're running Debian Stable. Most of this guide was written for Debian Bookworm, specifically [12.11](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.11.0-amd64-netinst.iso).
 
 Perform a standard install, without a desktop environment, with a SSH server.
 
@@ -13,7 +13,7 @@ Enable the `contrib` repository. Install from backports:
 ```bash
 apt install -t stable-backports zfsutils-linux linux-headers-amd64
 ```
-> **NOTE** Do not use the `--no-install-recommends` flag when installing this package, as it will not install `zfs-dkms`.
+> **NOTE** Do not use the `--no-install-recommends` flag when installing this package, as it will *not* install `zfs-dkms`.
 
 ### ARC size
 
@@ -123,10 +123,10 @@ Podman may also work, but will require siginificant re-tooling into whatever the
 ```yaml
 services:
   app:
-    ...
+    [...]
     devices:
       - nvidia.com/gpu=all
-    ...
+    [...]
 ```
 
 The catch is you may need to run `nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml` on every boot.
@@ -163,7 +163,7 @@ systemctl disable --now dnsmasq.service
 
 ## TrueNAS
 
-Installing Debin on the TrueNAS webui needs some tweaks.
+Installing Debian on the TrueNAS webui will need some tweaks to work.
 
 - Set the VNC resolution to 800x600.
 - After installing, go back into recovery mode in the ISO, and install GRUB on the "removable" ESP.
@@ -175,3 +175,60 @@ Install Tailscale:
 ```bash
 curl -fsSL https://tailscale.com/install.sh | sh
 ```
+
+## Migration
+
+### From TrueNAS SCALE
+
+#### Alternate root
+TrueNAS uses the `zpool` property `altroot` to specify a mountpoint below `/`. For example:
+
+```bash
+$ zpool get altroot Homelab
+NAME     PROPERTY  VALUE    SOURCE
+Homelab  altroot   /mnt     local
+```
+
+`zfs` will inherit the alternate root, and will appropriately prepend the value when mounting. Continuing the example:
+
+```bash
+$ zfs get mountpoint Homelab
+NAME     PROPERTY    VALUE         SOURCE
+Homelab  mountpoint  /mnt/Homelab  local
+```
+
+However, when setting a new mountpoint for the pool, you will have to remember that `zfs` will prepend the altroot. For example, if we want to change the mountpoint for `Homelab` to `/pool/Homelab`, this will not work:
+
+```bash
+# zfs set mountpoint=/pool/Homelab Homelab
+```
+
+Instead, you can either change the `zpool altroot` property, or erase it and manage the mountpoint with `zfs`:
+
+```bash
+# zpool set altroot=/pool Homelab
+```
+
+#### Removing the Nvidia drivers
+
+TrueNAS SCALE is an immutable operating system, similar to `rpm-ostree`, or the modern macOS. This means kernel extentions and modules outside the base system are "layered-on" top of the base image. Installing a kernel module may not survive reboots or upgrades.
+
+When installing the Nvidia drivers on SCALE, there a lot of beind-the-scenes black magic that happens to make everything seamless. In order to remove the drivers after changing the hardware, there is significant manual work involved.
+
+Before starting, make sure to:
+1. Remove all containers. Images built when the Nvidia container toolkit was installed will no longer work, and will need to be rebuilt.
+2. Remove all declerations to the Nvidia driver from your compose directives, helm charts or podman units.
+3. Stop all "Apps" and other services using the docker daemon.
+4. Stop the docker daemon itself. (`# systemctl disable --now docker.service`)
+5. We will require the tools iX uses to work on SCALE, install them with `# install-dev-tools`.
+
+Once that is done:
+1. Remove the layer `# systemd-sysext unmerge`.
+2. Get the label for the layer `# systemd-sysext list`, you will need the `PATH` value.
+3. Remove the image `# rm $PATH`.
+4. Disable the Nvidia driver in Docker `# midclt call --job docker.update '{"nvidia": false}'`.
+  - Verify the change with `# midclt call docker.config`.
+5. Enable the docker daemon without starting it `# systemctl enable docker.service`.
+6. Reboot the machine.
+
+Thanks to [juchong](https://forums.truenas.com/u/juchong/summary) on the TrueNAS forums for this [solution](https://forums.truenas.com/t/error-response-from-daemon-unknown-or-invalid-runtime-name-nvidia/50285)!

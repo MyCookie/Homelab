@@ -8,13 +8,6 @@ services:
     container_name: nextcloud # only available when deploying using docker-compose
     network_mode: service:tailscale
     restart: no
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1 # alternatively, use `count: all` for all GPUs
-              capabilities: [gpu]
     depends_on:
       - ollama
       - minio
@@ -29,13 +22,6 @@ services:
     container_name: nextcloud-cron
     network_mode: service:tailscale
     restart: no
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1 # alternatively, use `count: all` for all GPUs
-              capabilities: [gpu]
     depends_on:
       - minio
       - mariadb

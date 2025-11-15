@@ -14,5 +14,9 @@ services:
       - $VOLUMES_PATH/jellyfin/config:/config
       - type: bind
         source: $MEDIA_PATH
-        target: $MEDIA_PATH
+        target: /library
+        read_only: true
+      - type: bind
+        source: $DOWNLOAD_PATH
+        target: /downloads
         read_only: true

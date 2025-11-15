@@ -7,7 +7,6 @@ include:
   - services/jellyfin.yaml
   - services/nextcloud.yaml
   - services/nextclouddb.yaml
-  - services/openwebui.yaml
   - services/synapse.yaml
   - services/youtubedl.yaml
 

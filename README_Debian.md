@@ -10,7 +10,7 @@ Perform a standard install, without a desktop environment, with a SSH server.
 
 Enable the `contrib` repository. Install from backports:
 
-```bash
+```console
 apt install -t stable-backports zfsutils-linux linux-headers-amd64
 ```
 > **NOTE** Do not use the `--no-install-recommends` flag when installing this package, as it will *not* install `zfs-dkms`.
@@ -21,13 +21,13 @@ Get the size of the memory pool in bytes with `free --bytes`.
 
 Set the ARC size for each boot with:
 
-```bash
+```console
 echo "options zfs zfs_arc_max=$SOME_BYTES" >> /etc/modprobe.d/zfs.conf
 ```
 
 Set the ARC size for the current boot with:
 
-```bash
+```console
 echo "$SOME_BYTES" > /sys/module/zfs/parameters/zfs_arc_max
 ```
 
@@ -74,7 +74,7 @@ jobs:
 
 ### NFS
 
-```bash
+```console
 apt install nfs-kernel-server
 ```
 
@@ -82,13 +82,13 @@ apt install nfs-kernel-server
 
 >**WARNING**: *EXTREMELY DANGEROUS*. This is permenent. Only do this if you completely understand what you're doing.
 
-```bash
+```console
 zfs list -t snapshot -o name | grep $SNAPSHOT_PREFIX | xargs -n1 zfs destroy
 ```
 
 ## Cockpit
 
-```bash
+```console
 apt install --no-install-recommends cockpit cockpit-packagekit cockpit-pcp
 ```
 
@@ -96,7 +96,7 @@ apt install --no-install-recommends cockpit cockpit-packagekit cockpit-pcp
 
 Enable the `contrib`, `non-free` and `non-free-firmware` repositories. For a headless install:
 
-```bash
+```console
 apt install --no-install-recommends nvidia-driver firmware-misc-nonfree nvidia-smi
 ```
 
@@ -108,7 +108,7 @@ apt install --no-install-recommends nvidia-driver firmware-misc-nonfree nvidia-s
 
 ### Watchtower
 
-```bash
+```console
 docker run --interactive --tty --detach --name watchtower --restart always --env WATCHTOWER_CLEANUP --env WATCHTOWER_CLEANUP_VOLUMES --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower
 ```
 
@@ -135,13 +135,13 @@ The catch is you may need to run `nvidia-ctk cdi generate --output=/etc/cdi/nvid
 
 Install libvirt and the cockpit VM webui:
 
-```bash
+```console
 apt install --no-install-recommends qemu-system libvirt-daemon-system libvirt-clients qmeu-utils ovmf virtinst cockpit-machines
 ```
 
 We are not supposed to run an instance of `dnsmasq` outside the control of `libvirt`. If you do, networking will fail to create the interfaces it needs. If you see the something similar to:
 
-```bash
+```console
 Could not start virtual network 'default': internal error
 Child process (/usr/sbin/dnsmasq --strict-order --bind-interfaces
 --pid-file=/var/run/libvirt/network/default.pid --conf-file=
@@ -155,7 +155,7 @@ Then there is another instance of `dnsmasq` (or another DHCP daemon that calls i
 
 Disable `dnsmasq`:
 
-```bash
+```console
 systemctl disable --now dnsmasq.service
 ```
 
@@ -172,7 +172,7 @@ Installing Debian on the TrueNAS webui will need some tweaks to work.
 
 Install Tailscale:
 
-```bash
+```console
 curl -fsSL https://tailscale.com/install.sh | sh
 ```
 
@@ -183,7 +183,7 @@ curl -fsSL https://tailscale.com/install.sh | sh
 #### Alternate root
 TrueNAS uses the `zpool` property `altroot` to specify a mountpoint below `/`. For example:
 
-```bash
+```console
 $ zpool get altroot Homelab
 NAME     PROPERTY  VALUE    SOURCE
 Homelab  altroot   /mnt     local
@@ -191,7 +191,7 @@ Homelab  altroot   /mnt     local
 
 `zfs` will inherit the alternate root, and will appropriately prepend the value when mounting. Continuing the example:
 
-```bash
+```console
 $ zfs get mountpoint Homelab
 NAME     PROPERTY    VALUE         SOURCE
 Homelab  mountpoint  /mnt/Homelab  local
@@ -199,13 +199,13 @@ Homelab  mountpoint  /mnt/Homelab  local
 
 However, when setting a new mountpoint for the pool, you will have to remember that `zfs` will prepend the altroot. For example, if we want to change the mountpoint for `Homelab` to `/pool/Homelab`, this will not work:
 
-```bash
+```console
 # zfs set mountpoint=/pool/Homelab Homelab
 ```
 
 Instead, you can either change the `zpool altroot` property, or erase it and manage the mountpoint with `zfs`:
 
-```bash
+```console
 # zpool set altroot=/pool Homelab
 ```
 

@@ -7,6 +7,10 @@ services:
     container_name: jellyfin
     restart: no
     network_mode: service:tailscale
+    group_add:
+      - ${RENDER_GROUP_ID}
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
     depends_on:
       - tailscale
     volumes:

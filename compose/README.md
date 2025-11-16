@@ -228,6 +228,35 @@ To enable transcoding, install the container toolkit, as well as the required pa
 apt install --no-install-recommends libnvidia-encode1
 ```
 
+### Intel QuickSync
+
+Add the `render` group ID to the docker container:
+
+```console
+$ getent group render | cut -d: -f3
+```
+
+```yaml
+services:
+  jellyfin:
+    [...]
+    group_add:
+      - '${GROUP_ID}'
+    [...]
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # change this to the render device you wish to use
+    [...]
+```
+
+Check if this works:
+
+```console
+# docker exec -it jellyfin /usr/lib/jellyfin-ffmpeg/vainfo
+# docker exec -it jellyfin /usr/lib/jellyfin-ffmpeg/ffmpeg -v verbose -init_hw_device vaapi=va -init_hw_device opencl@va
+```
+
+The full documentation is [here](https://jellyfin.org/docs/general/post-install/transcoding/hardware-acceleration/intel).
+
 ## Tailscale
 
 ### Caddy with sidecar container

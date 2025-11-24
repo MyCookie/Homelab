@@ -2,25 +2,6 @@ include:
   - networks/nextcloud.yaml
 
 services:
-  minio:
-    image: quay.io/minio/minio
-    restart: no
-    user: $UID:$GID
-    container_name: minio
-    command: 'server /data --console-address ":9001"'
-    healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - nextcloud
-    volumes:
-      - type: bind
-        source: $VOLUMES_PATH_HDD/minio/data
-        target: /data
-        read_only: false
-
   adminer:
     image: adminer
     container_name: adminer

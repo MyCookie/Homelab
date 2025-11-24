@@ -4,7 +4,8 @@ include:
 services:
   minio:
     image: quay.io/minio/minio
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID
     container_name: minio
     command: 'server /data --console-address ":9001"'
     healthcheck:
@@ -23,14 +24,16 @@ services:
   adminer:
     image: adminer
     container_name: adminer
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID
     networks:
       - nextcloud
 
   ollama:
     image: ollama/ollama
     container_name: ollama
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID
     networks:
       - nextcloud
     volumes:
@@ -45,7 +48,8 @@ services:
     networks:
       - nextcloud
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
-    restart: unless-stopped
+    restart: always
+    user: $UID:$GID
     environment:
       - MARIADB_AUTO_UPGRADE=0 # disabled by default
     volumes:
@@ -59,4 +63,5 @@ services:
     container_name: redis
     networks:
       - nextcloud
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID

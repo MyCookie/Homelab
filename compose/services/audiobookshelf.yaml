@@ -5,7 +5,8 @@ services:
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     container_name: audiobookshelf
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID
     networks:
       - homelab
     hostname: audiobookshelf
@@ -29,4 +30,4 @@ services:
         target: /metadata
         read_only: false
     environment:
-      - TZ=America/Edmonton
+      - TZ=$TIMEZONE

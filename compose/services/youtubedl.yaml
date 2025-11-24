@@ -6,7 +6,8 @@ services:
     image: tzahi12345/youtubedl-material
     container_name: youtubedl
     hostname: youtubedl
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID
     networks:
       - homelab
     ports:

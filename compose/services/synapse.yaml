@@ -7,7 +7,7 @@ services:
     container_name: synapse
     hostname: synapse
     restart: no
-    user: 1000:1000
+    user: $UID:$GID
     ports:
       - 8008:8008
     networks:
@@ -16,7 +16,7 @@ services:
       - synapsedb
     volumes:
       - type: bind
-        source: $VOLUMES_PATH_HDD/synapse/data
+        source: $VOLUMES_PATH/synapse/data
         target: /data
         read_only: false
 
@@ -25,6 +25,7 @@ services:
     container_name: synapsedb
     hostname: synapsedb
     restart: always
+    user: $UID:$GID
     networks:
       - homelab
     volumes:

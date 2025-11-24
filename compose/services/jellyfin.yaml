@@ -6,6 +6,7 @@ services:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: no
+    user: $UID:$GID
     network_mode: service:tailscale
     group_add:
       - ${RENDER_GROUP_ID}

@@ -5,7 +5,8 @@ services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:ollama
     container_name: open-webui
-    restart: unless-stopped
+    restart: no
+    user: $UID:$GID
     networks:
       - nextcloud
     ports:

@@ -5,6 +5,7 @@ include:
   - services/audiobookshelf.yaml
   - services/forgejo.yaml
   - services/jellyfin.yaml
+  - services/minio.yaml
   - services/nextcloud.yaml
   - services/nextclouddb.yaml
   - services/synapse.yaml

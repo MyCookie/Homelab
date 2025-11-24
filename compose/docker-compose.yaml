@@ -20,8 +20,14 @@ services:
       - nextcloud
     env_file: services/env/tailscale.env
     volumes:
-      - $VOLUMES_PATH/tailscale/var/lib/tailscale:/var/lib/tailscale
-      - $VOLUMES_PATH/tailscale/etc/tailscale/serve/nextcloud.conf:/etc/tailscale/serve/nextcloud.conf
+      - type: bind
+        source: $VOLUMES_PATH/tailscale/etc/tailscale/serve/nextcloud.conf
+        target: /etc/tailscale/serve/nextcloud.conf
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/tailscale/var/lib/tailscale
+        target: /var/lib/tailscale
+        read_only: false
     devices:
       - /dev/net/tun:/dev/net/tun
     cap_add:

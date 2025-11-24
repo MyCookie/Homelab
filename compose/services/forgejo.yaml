@@ -18,6 +18,15 @@ services:
       - USER_UID=1000
       - USER_GID=1000
     volumes:
-      - $VOLUMES_PATH/forgejo/data:/data
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: /etc/timezone
+        target: /etc/timezone
+        read_only: true
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+      - type: bind
+        source: $VOLUMES_PATH/forgejo/data
+        target: /data
+        read_only: false

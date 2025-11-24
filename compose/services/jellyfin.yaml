@@ -14,8 +14,14 @@ services:
     depends_on:
       - tailscale
     volumes:
-      - $VOLUMES_PATH/jellyfin/cache:/cache
-      - $VOLUMES_PATH/jellyfin/config:/config
+      - type: bind
+        source: $VOLUMES_PATH/jellyfin/cache
+        target: /cache
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/jellyfin/config
+        target: /config
+        read_only: false
       - type: bind
         source: $MEDIA_PATH
         target: /library

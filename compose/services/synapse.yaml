@@ -15,7 +15,10 @@ services:
     depends_on:
       - synapsedb
     volumes:
-      - $VOLUMES_PATH/synapse/data:/data
+      - type: bind
+        source: $VOLUMES_PATH_HDD/synapse/data
+        target: /data
+        read_only: false
 
   synapsedb:
     image: postgres:13-alpine
@@ -25,6 +28,9 @@ services:
     networks:
       - homelab
     volumes:
-      - $VOLUMES_PATH/postgres/data:/var/lib/postgresql/data
+      - type: bind
+        source: $VOLUMES_PATH/postgres/data
+        target: /var/lib/postgresql/data
+        read_only: false
     environment:
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C

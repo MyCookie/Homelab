@@ -15,7 +15,10 @@ services:
     networks:
       - nextcloud
     volumes:
-      - $VOLUMES_PATH/minio/data:/data
+      - type: bind
+        source: $VOLUMES_PATH_HDD/minio/data
+        target: /data
+        read_only: false
 
   adminer:
     image: adminer
@@ -31,7 +34,10 @@ services:
     networks:
       - nextcloud
     volumes:
-      - $VOLUMES_PATH/ollama/root/.ollama:/root/.ollama
+      - type: bind
+        source: $VOLUMES_PATH/ollama/root/.ollama
+        target: /root/.ollama
+        read_only: false
 
   mariadb:
     image: mariadb:10.11
@@ -43,7 +49,10 @@ services:
     environment:
       - MARIADB_AUTO_UPGRADE=0 # disabled by default
     volumes:
-      - $VOLUMES_PATH/mariadb/var/lib/mysql:/var/lib/mysql
+      - type: bind
+        source: $VOLUMES_PATH/mariadb/var/lib/mysql
+        target: /var/lib/mysql
+        read_only: false
 
   redis:
     image: redis

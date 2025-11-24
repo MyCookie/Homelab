@@ -14,8 +14,23 @@ services:
     environment:
       - WRITE_YTDL_CONFIG=true
     volumes:
-      - $VOLUMES_PATH/youtubedl-material/appdata:/app/appdata
-      - $VOLUMES_PATH/youtubedl-material/audio:/app/audio
-      - $VOLUMES_PATH/youtubedl-material/video:/app/video
-      - $VOLUMES_PATH/youtubedl-material/subscriptions:/app/subscriptions
-      - $VOLUMES_PATH/youtubedl-material/users:/app/users
+      - type: bind
+        source: $VOLUMES_PATH_HDD/youtubedl-material/appdata
+        target: /app/appdata
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH_HDD/youtubedl-material/audio
+        target: /app/audio
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH_HDD/youtubedl-material/video
+        target: /app/video
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH_HDD/youtubedl-material/subscriptions
+        target: /app/subscriptions
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH_HDD/youtubedl-material/users
+        target: /app/users
+        read_only: false

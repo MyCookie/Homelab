@@ -18,5 +18,11 @@ services:
               count: 1 # alternatively, use `count: all` for all GPUs
               capabilities: [gpu]
     volumes:
-      - $VOLUMES_PATH/open-webui/app/backend/data:/app/backend/data
-      - $VOLUMES_PATH/open-webui/root/.ollama:/root/.ollama
+      - type: bind
+        source: $VOLUMES_PATH/open-webui/app/backend/data
+        target: /app/backend/data
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/open-webui/root/.ollama:/root/.ollama
+        target: /root/.ollama:/root/.ollama
+        read_only: false

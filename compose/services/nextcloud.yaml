@@ -15,7 +15,10 @@ services:
       - redis
       - tailscale
     volumes:
-      - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
+      - type: bind
+        source: $VOLUMES_PATH/nextcloud/var/www/html
+        target: /var/www/html
+        read_only: false
 
   nextcloud-cron:
     image: nextcloud:30
@@ -29,4 +32,7 @@ services:
       - redis
     entrypoint: /cron.sh
     volumes:
-      - $VOLUMES_PATH/nextcloud/var/www/html:/var/www/html
+      - type: bind
+        source: $VOLUMES_PATH/nextcloud/var/www/html
+        target: /var/www/html
+        read_only: false

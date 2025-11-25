@@ -45,7 +45,6 @@ services:
     container_name: synapsedb
     hostname: synapsedb
     restart: always
-    user: $UID:$GID
     networks:
       - homelab
     volumes:

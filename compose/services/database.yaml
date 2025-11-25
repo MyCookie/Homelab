@@ -31,7 +31,6 @@ services:
       - nextcloud
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
     restart: always
-    user: $UID:$GID
     environment:
       - MARIADB_AUTO_UPGRADE=0 # disabled by default
     volumes:

@@ -6,7 +6,7 @@ services:
     image: matrixdotorg/synapse
     container_name: synapse
     hostname: synapse
-    restart: no
+    restart: always
     user: $UID:$GID
     ports:
       - 8008:8008

@@ -1,5 +1,6 @@
 include:
   - networks/nextcloud.yaml
+  - networks/homelab.yaml
 
 services:
   adminer:
@@ -13,7 +14,7 @@ services:
   ollama:
     image: ollama/ollama
     container_name: ollama
-    restart: no
+    restart: always
     user: $UID:$GID
     networks:
       - nextcloud
@@ -60,5 +61,5 @@ services:
     container_name: redis
     networks:
       - nextcloud
-    restart: no
+    restart: always
     user: $UID:$GID

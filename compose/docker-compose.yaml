@@ -16,7 +16,6 @@ services:
     image: tailscale/tailscale
     container_name: tailscale
     restart: no
-    user: $UID:$GID
     hostname: tailscale
     networks:
       - nextcloud

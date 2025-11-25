@@ -1,6 +1,6 @@
 include:
   - networks/nextcloud.yaml
-  - nextclouddb.yaml
+  - database.yaml
 
 services:
   forgejo:

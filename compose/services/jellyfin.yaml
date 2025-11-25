@@ -9,7 +9,7 @@ services:
     user: $UID:$GID
     network_mode: service:tailscale
     group_add:
-      - ${RENDER_GROUP_ID}
+      - $RENDER_GROUP_ID
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
     depends_on:

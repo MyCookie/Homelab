@@ -8,7 +8,6 @@ services:
     container_name: nextcloud # only available when deploying using docker-compose
     network_mode: service:tailscale
     restart: no
-    user: $UID:$GID
     depends_on:
       - ollama
       - minio
@@ -27,7 +26,6 @@ services:
     networks:
       - nextcloud
     restart: no
-    user: $UID:$GID
     depends_on:
       - minio
       - mariadb

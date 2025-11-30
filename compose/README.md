@@ -121,19 +121,19 @@ The Caddyfile contains these directives.
 
 By default the Postgres Docker image makes a `postgres` admin user. To work with the database:
 ```bash
-docker exec --interactive --tty --user postgres synapsedb $COMMAND
+docker exec --interactive --tty --user postgres postgres $COMMAND
 ```
 
 To setup and convert Synapse from SQLite to Postgres:
 
 1. Create the `synapse` user:
     ```bash
-    docker exec -it -u postgres synapsedb createuser --pwprompt synapse
+    docker exec -it -u postgres postgres createuser --pwprompt synapse
     ```
    Enter the password when prompted.
 2. Create the `synapse` database:
     ```bash
-    docker exec -it -u postgres synapsedb createdb --encoding=UTF8 --locale=C --template=template0 --owner=synapse synapse
+    docker exec -it -u postgres postgres createdb --encoding=UTF8 --locale=C --template=template0 --owner=synapse synapse
     ```
 3. Copy the existing `homeserver.yaml` to `homeserver.postgres.yaml` and edit its database section:
    ```yaml
@@ -143,7 +143,7 @@ To setup and convert Synapse from SQLite to Postgres:
         user: synapse
         password: $SYNAPSE_USER_PASS
         dbname: synapse
-        host: synapsedb
+        host: postgres
         cp_min: 5
         cp_max: 10
    ```
@@ -160,7 +160,7 @@ Sometimes, depending on the version of Synapse you started with, you may need to
 Use the docker image `pgautoupgrade/pgautoupgrade:$PG_VERSION-alpine`.
 
 ```bash
-docker run --name pgautoupgrade -it --mount type=bind,source=/data/volumes/postgres/data,target=/var/lib/postgresql/data -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e PGAUTO_ONESHOT=yes pgautoupgrade/pgautoupgrade:13-alpine
+docker run --name pgautoupgrade -it --mount type=bind,source=/data/volumes/postgres/data,target=/var/lib/postgresql/data -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e PGAUTO_ONESHOT=yes pgautoupgrade/pgautoupgrade:14-alpine
 ```
 
 [The Github repo has more information for involved upgrades.](https://github.com/pgautoupgrade/docker-pgautoupgrade)

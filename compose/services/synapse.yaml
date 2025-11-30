@@ -13,7 +13,7 @@ services:
     networks:
       - homelab
     depends_on:
-      - synapsedb
+      - postgres
     volumes:
       - type: bind
         source: $VOLUMES_PATH/synapse/data

@@ -39,10 +39,10 @@ services:
         target: /var/lib/mysql
         read_only: false
 
-  synapsedb:
-    image: postgres:13-alpine
-    container_name: synapsedb
-    hostname: synapsedb
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    hostname: postgres
     restart: always
     networks:
       - homelab

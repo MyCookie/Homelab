@@ -4,7 +4,7 @@ include:
 
 services:
   forgejo:
-    image: codeberg.org/forgejo/forgejo:7
+    image: codeberg.org/forgejo/forgejo:11
     container_name: forgejo
     restart: always
     networks:
@@ -17,6 +17,10 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
+      # Forgejo 11 breaks compatibility with Gitea
+      # Uncomment if deployment was migrated before v7
+      # - GITEA_APP_INI=/data/gitea/conf/app.ini
+      # - FORGEJO_APP_INI=/data/gitea/conf/app.ini
     volumes:
       - type: bind
         source: /etc/timezone

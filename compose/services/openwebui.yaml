@@ -4,26 +4,34 @@ include:
 services:
   openwebui:
     image: ghcr.io/open-webui/open-webui:ollama
-    container_name: open-webui
+    container_name: openwebui
     restart: no
     user: $UID:$GID
     networks:
       - nextcloud
     ports:
       - "8080:8080"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1 # alternatively, use `count: all` for all GPUs
-              capabilities: [gpu]
+    # Uncomment for Intel
+    # group_add:
+    #   - $RENDER_GROUP_ID
+    # devices:
+    #   - /dev/dri/renderD128:/dev/dri/renderD128
+    # environment:
+    #   - OLLAMA_INTEL_GPU=true
+    # Uncomment for Nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1 # alternatively, use `count: all` for all GPUs
+    #           capabilities: [gpu]
     volumes:
       - type: bind
         source: $VOLUMES_PATH/open-webui/app/backend/data
         target: /app/backend/data
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH/open-webui/root/.ollama:/root/.ollama
-        target: /root/.ollama:/root/.ollama
+        source: $VOLUMES_PATH/open-webui/root/.ollama
+        target: /root/.ollama
         read_only: false

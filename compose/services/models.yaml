@@ -1,0 +1,34 @@
+include:
+  - networks/nextcloud.yaml
+  - networks/homelab.yaml
+
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: always
+    # Uncomment for Intel
+    # group_add:
+    #   - $RENDER_GROUP_ID
+    # devices:
+    #   - /dev/dri/renderD128:/dev/dri/renderD128
+    # environment:
+    #   - OLLAMA_INTEL_GPU=true
+    # Uncomment for Nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1 # alternatively, use `count: all` for all GPUs
+    #           capabilities: [gpu]
+    networks:
+      - nextcloud
+      - homelab
+    ports:
+      - 11434:11434
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/ollama/root/.ollama
+        target: /root/.ollama
+        read_only: false

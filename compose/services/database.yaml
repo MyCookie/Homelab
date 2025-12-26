@@ -11,19 +11,6 @@ services:
     networks:
       - nextcloud
 
-  ollama:
-    image: ollama/ollama
-    container_name: ollama
-    restart: always
-    user: $UID:$GID
-    networks:
-      - nextcloud
-    volumes:
-      - type: bind
-        source: $VOLUMES_PATH/ollama/root/.ollama
-        target: /root/.ollama
-        read_only: false
-
   mariadb:
     image: mariadb:10.11
     container_name: mariadb # only available when deploying using docker-compose

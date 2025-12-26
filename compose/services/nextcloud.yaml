@@ -4,7 +4,7 @@ include:
 
 services:
   nextcloud:
-    image: nextcloud:30
+    image: nextcloud:31
     container_name: nextcloud # only available when deploying using docker-compose
     network_mode: service:tailscale
     restart: no
@@ -21,7 +21,7 @@ services:
         read_only: false
 
   nextcloud-cron:
-    image: nextcloud:30
+    image: nextcloud:31
     container_name: nextcloud-cron
     networks:
       - nextcloud

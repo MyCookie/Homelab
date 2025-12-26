@@ -10,8 +10,9 @@ services:
     network_mode: service:tailscale
     group_add:
       - $RENDER_GROUP_ID
-    devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128
+    # Uncomment for QuickSync transcode
+    # devices:
+    #   - /dev/dri/renderD128:/dev/dri/renderD128
     depends_on:
       - tailscale
     volumes:
@@ -24,10 +25,14 @@ services:
         target: /config
         read_only: false
       - type: bind
-        source: $MEDIA_PATH
-        target: /library
+        source: $MEDIA_PATH/Movies
+        target: /library/movies
         read_only: true
       - type: bind
-        source: $DOWNLOAD_PATH
-        target: /downloads
+        source: $MEDIA_PATH/TV
+        target: /library/tv
+        read_only: true
+      - type: bind
+        source: $MEDIA_PATH/Music
+        target: /library/music
         read_only: true

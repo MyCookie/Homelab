@@ -31,27 +31,24 @@ services:
       - servarr
     # Ports will be routed through this container
     ports:
-      - 8088:8080 # qbittorrent
-      - 9696:9696 # prowlarr
-      - 7878:7878 # radarr
-      - 8989:8989 # sonarr
+      - "8088:8088" # qbittorrent
+      - "8888:8888" # sabnzbd
+      - "9696:9696" # prowlarr
+      - "8191:8191" # flaresolverr
+      - "7878:7878" # radarr
+      - "8686:8686" # lidarr
+      - "8989:8989" # sonarr
+      - "8096:8096" # jellyfin
     env_file:
       - env/servarr.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - UMASK=002
-      - TZ=America/Edmonton # Better to keep this as TZ/Utc?
       - VPN_ENABLED=true
-      - VPN_CONF=wg0 # This file points to $VOLUMES_PATH/servarr/config/wireguard/wg0.conf
+      - VPN_CONF=wg0
       - VPN_PROVIDER=generic
-      - VPN_LAN_NETWORK=192.168.1.0/24
+      - VPN_LAN_NETWORK=192.168.0.0/16,100.64.0.0/10
       - VPN_LAN_LEAK_ENABLED=false
-      # These ports are routed to the internal LAN, not to the VPN
-      # REMEMBER to add webui ports to this list when adding services
-      - VPN_EXPOSE_PORTS_ON_LAN=9696/tcp,7878/tcp,8989/tcp,8088/tcp
-      # We don't need to add the requested port here, even though the documentation
-      # may imply that at first glance.
+      # Add ports to the list below to open them over LAN
+      - VPN_EXPOSE_PORTS_ON_LAN=9696/tcp,8191/tcp,7878/tcp,8686/tcp,8989/tcp,8088/tcp,8888/tcp,8096/tcp
       - VPN_AUTO_PORT_FORWARD=false
       - VPN_AUTO_PORT_FORWARD_TO_PORTS=
       - VPN_FIREWALL_TYPE=auto
@@ -60,46 +57,81 @@ services:
       - PRIVOXY_ENABLED=false
       - UNBOUND_ENABLED=false
       - UNBOUND_NAMESERVERS
+    healthcheck:
+      # Technically, it's better to piggyback on what hotio uses during startup:
+      # https://github.com/hotio/root-files/blob/6/root/etc/s6-overlay/s6-rc.d/init-setup/run
+      # https://github.com/hotio/root-files/blob/6/root/etc/s6-overlay/s6-rc.d/init-wireguard/run.up
+      test: ["CMD", "curl", "-sS", "https://ifconfig.io/ip"] # Check if network is up
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 30s # Time to wait before starting health checks
     cap_add:
       - NET_ADMIN
     sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv4.conf.all.src_valid_mark=1 #
+      - net.ipv6.conf.all.disable_ipv6=1 #
     volumes:
       - $VOLUMES_PATH/servarr/config:/config
 
-  # We won't be creating a user, instead we'll make sure the umask is set so the
-  # various 'arrs can read the files downloaded
   qbittorrent:
     image: ghcr.io/hotio/qbittorrent
     container_name: qbittorrent
     restart: no
     depends_on:
-      - servarr
-    # We're using the base image's network stack
+      servarr:
+        condition: service_healthy
     network_mode: "service:servarr"
     env_file:
       - env/servarr.env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - UMASK=002
-      - TZ=America/Toronto
-      # Even though we're actually exposing the ports on servarr's container, we'll
-      # leave this in since it doesn't really do anything
-      - WEBUI_PORTS=8080/tcp,8080/udp
+      - WEBUI_PORTS=8088/tcp,8088/udp # change from default 8080
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "qbittorrent-nox-lib1"] # Check if process is running
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     volumes:
       - type: bind
         source: $VOLUMES_PATH/qbittorrent/config
         target: /config
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH_ARR_BT
-        target: $DOWNLOAD_PATH_ARR_BT
+        source: $DOWNLOAD_PATH/Torrents
+        target: /downloads
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH_BT
-        target: $DOWNLOAD_PATH_BT
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: false
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd
+    container_name: sabnzbd
+    restart: no
+    depends_on:
+      servarr:
+        condition: service_healthy
+    network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
+    environment:
+      - WEBUI_PORTS=8888/tcp,8888/udp # change from default 8080
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "SABnzbd.py"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/sabnzbd/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
+        target: /nzb
         read_only: false
 
   prowlarr:
@@ -107,78 +139,175 @@ services:
     container_name: prowlarr
     restart: no
     depends_on:
-      - servarr
-    # We're using the base image's network stack
+      servarr:
+        condition: service_healthy
     network_mode: "service:servarr"
     env_file:
       - env/servarr.env
-    environment:
-      - PUID=1000
-      - GUID=1000
-      - UMASK=002
-      - TZ=America/Edmonton
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Prowlarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     volumes:
       - type: bind
         source: $VOLUMES_PATH/prowlarr/config
         target: /config
         read_only: false
 
-  # Create the user radarr with UID $RADARR_UID
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: no
+    depends_on:
+      servarr:
+        condition: service_healthy
+    network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FILE=${LOG_FILE:-none}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "python"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/flaresolverr/config
+        target: /config
+        read_only: false
+
   radarr:
     image: ghcr.io/hotio/radarr
     container_name: radarr
     restart: no
     depends_on:
-      - servarr
-    # We're using the base image's network stack
+      servarr:
+        condition: service_healthy
     network_mode: "service:servarr"
     env_file:
       - env/servarr.env
-    environment:
-      - PUID=$RADARR_UID
-      - GUID=$ARR_GID
-      - UMASK=002
-      - TZ=America/Edmonton
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Radarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     volumes:
       - type: bind
         source: $VOLUMES_PATH/radarr/config
         target: /config
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH_ARR
-        target: $DOWNLOAD_PATH_ARR
-        read_only: true
-      - type: bind
-        source: $LIBRARY_PATH_MOVIES
-        target: $LIBRARY_PATH_MOVIES
+        source: $LIBRARY_PATH/Movies
+        target: /library/movies
         read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: true
 
-  # Create the user sonarr with UID $SONARR_UID
   sonarr:
     image: ghcr.io/hotio/sonarr
     container_name: sonarr
     restart: no
     depends_on:
-      - servarr
-    # We're using the base image's network stack
+      servarr:
+        condition: service_healthy
     network_mode: "service:servarr"
     env_file:
       - env/servarr.env
-    environment:
-      - PUID=$SONARR_UID
-      - GUID=$ARR_GID
-      - UMASK=002
-      - TZ=America/Edmonton
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Sonarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     volumes:
       - type: bind
         source: $VOLUMES_PATH/sonarr/config
         target: /config
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH_ARR
-        target: $DOWNLOAD_PATH_ARR
+        source: $LIBRARY_PATH/TV
+        target: /library/tv
+        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: true
+
+  lidarr:
+    image: ghcr.io/hotio/lidarr
+    container_name: lidarr
+    restart: no
+    depends_on:
+      servarr:
+        condition: service_healthy
+    network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Lidarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/lidarr/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $LIBRARY_PATH/Music
+        target: /library/music
+        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: true
+
+  jellyfin:
+    image: ghcr.io/hotio/jellyfin
+    container_name: jellyfin
+    restart: no
+    depends_on:
+      servarr:
+        condition: service_healthy
+    network_mode: "service:servarr"
+    env_file:
+      - env/servarr.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "localhost:8096/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      ## TODO: move cache to /config/cache before deploying
+      # - type: bind
+      #   source: $VOLUMES_PATH/jellyfin/cache
+      #   target: /cache
+      #   read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/jellyfin/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $MEDIA_PATH
+        target: /library
         read_only: true
       - type: bind
-        source: $LIBRARY_PATH_TV
-        target: $LIBRARY_PATH_TV
-        read_only: false
+        source: $DOWNLOAD_PATH
+        target: /downloads
+        read_only: true
+
+networks:
+  servarr:
+    name: servarr

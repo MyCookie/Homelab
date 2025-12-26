@@ -7,7 +7,6 @@ services:
     container_name: youtubedl
     hostname: youtubedl
     restart: no
-    user: $UID:$GID
     networks:
       - homelab
     ports:

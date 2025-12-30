@@ -8,6 +8,7 @@ include:
   - services/minio.yaml
   - services/nextcloud.yaml
   - services/database.yaml
+  - services/models.yaml
   - services/synapse.yaml
   - services/youtubedl.yaml
 

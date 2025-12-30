@@ -14,19 +14,19 @@ services:
       - "13378:80"
     volumes:
       - type: bind
-        source: $VOLUMES_PATH_HDD/audiobookshelf/audiobooks
+        source: $VOLUMES_PATH/audiobookshelf/audiobooks
         target: /audiobooks
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/audiobookshelf/podcasts
+        source: $VOLUMES_PATH/audiobookshelf/podcasts
         target: /podcasts
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/audiobookshelf/config
+        source: $VOLUMES_PATH/audiobookshelf/config
         target: /config
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/audiobookshelf/metadata
+        source: $VOLUMES_PATH/audiobookshelf/metadata
         target: /metadata
         read_only: false
     environment:

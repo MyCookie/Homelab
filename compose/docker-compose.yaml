@@ -10,7 +10,7 @@ include:
   - services/database.yaml
   - services/models.yaml
   - services/synapse.yaml
-  - services/youtubedl.yaml
+  - services/openwebui.yaml
 
 services:
   tailscale:

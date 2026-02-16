@@ -1,0 +1,68 @@
+include:
+  - networks/cookies.yaml
+  - env/cookies.env
+
+services:
+  # docker run \
+  #   --name pgautoupgrade \
+  #   --interactive --tty --rm \
+  #   --mount type=bind,source=$VOLUMES_PATH/postgres-cookies/data,target=/var/lib/postgresql/data \
+  #   --env-file .env \
+  #   --env-file env/cookies.env \
+  #   pgautoupgrade/pgautoupgrade:13-alpine
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres-cookies
+    hostname: postgres
+    network:
+      - cookies
+    restart: always
+    env-file:
+      - cookies.env
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/postgres-cookies/data
+        target: /var/lib/postgresql/data
+        read_only: false
+
+  gitea:
+    image: gitea/gitea
+    container_name: gitea-cookies
+    restart: unless-stopped
+    hostname: gitea
+    network:
+      - cookies
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - type: bind
+        source: /etc/timezone
+        target: /etc/timezone
+        read_only: true
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+      - type: bind
+        source: $VOLUMES_PATH/gitea-cookies/data
+        target: /data
+        read_only: false
+
+  synapse:
+    image: matrixdotorg/synapse
+    container_name: synapse-cookies
+    hostname: synapse
+    restart: always
+    user: $UID:$GID
+    ports:
+      - 8009:8008
+    networks:
+      - cookies
+    depends_on:
+      - postgres-cookies
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/synapse-cookies/data
+        target: /data
+        read_only: false

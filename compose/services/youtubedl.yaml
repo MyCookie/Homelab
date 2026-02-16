@@ -15,22 +15,22 @@ services:
       - WRITE_YTDL_CONFIG=true
     volumes:
       - type: bind
-        source: $VOLUMES_PATH_HDD/youtubedl-material/appdata
+        source: $VOLUMES_PATH/youtubedl-material/appdata
         target: /app/appdata
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/youtubedl-material/audio
+        source: $VOLUMES_PATH/youtubedl-material/audio
         target: /app/audio
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/youtubedl-material/video
+        source: $VOLUMES_PATH/youtubedl-material/video
         target: /app/video
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/youtubedl-material/subscriptions
+        source: $VOLUMES_PATH/youtubedl-material/subscriptions
         target: /app/subscriptions
         read_only: false
       - type: bind
-        source: $VOLUMES_PATH_HDD/youtubedl-material/users
+        source: $VOLUMES_PATH/youtubedl-material/users
         target: /app/users
         read_only: false

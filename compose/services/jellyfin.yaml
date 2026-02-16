@@ -8,9 +8,9 @@ services:
     restart: no
     user: $UID:$GID
     network_mode: service:tailscale
-    group_add:
-      - $RENDER_GROUP_ID
     # Uncomment for QuickSync transcode
+    # group_add:
+    #   - $RENDER_GROUP_ID
     # devices:
     #   - /dev/dri/renderD128:/dev/dri/renderD128
     depends_on:
@@ -35,4 +35,8 @@ services:
       - type: bind
         source: $MEDIA_PATH/Music
         target: /library/music
+        read_only: true
+      - type: bind
+        source: $MEDIA_PATH/Soundtracks
+        target: /library/soundtracks
         read_only: true

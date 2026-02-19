@@ -2,9 +2,6 @@ networks:
   cookies:
     name: cookies
 
-include:
-  - env/cookies.env
-
 services:
   # docker run \
   #   --name pgautoupgrade \
@@ -17,7 +14,7 @@ services:
     image: postgres:14-alpine
     container_name: postgres-cookies
     hostname: postgres
-    network:
+    networks:
       - cookies
     restart: always
     env-file:
@@ -33,7 +30,7 @@ services:
     container_name: gitea-cookies
     restart: unless-stopped
     hostname: gitea
-    network:
+    networks:
       - cookies
     environment:
       - USER_UID=1000

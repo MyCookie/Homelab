@@ -1,5 +1,8 @@
+networks:
+  cookies:
+    name: cookies
+
 include:
-  - networks/cookies.yaml
   - env/cookies.env
 
 services:
@@ -18,7 +21,7 @@ services:
       - cookies
     restart: always
     env-file:
-      - cookies.env
+      - env/cookies.env
     volumes:
       - type: bind
         source: $VOLUMES_PATH/postgres-cookies/data

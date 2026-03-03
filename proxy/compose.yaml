@@ -1,6 +1,19 @@
 name: proxy
 
 services:
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower
+    container_name: watchtower
+    hostname: watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_CLEANUP_VOLUMES=true
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+
   caddy:
     image: caddy
     container_name: caddy

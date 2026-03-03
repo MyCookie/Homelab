@@ -1,0 +1,250 @@
+name: proxy
+
+services:
+  caddy:
+    image: caddy
+    container_name: caddy
+    hostname: caddy
+    restart: unless-stopped
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - type: bind
+        source: /run/tailscale/tailscaled.sock
+        target: /run/tailscale/tailscaled.sock
+        read_only: false
+      - type: volume
+        source: logs
+        target: /data/logs
+        read_only: false
+      - type: volume
+        source: domain_1_certs
+        target: /etc/ssl/$DOMAIN_1
+        read_only: true
+      - type: volume
+        source: domain_2_certs
+        target: /etc/ssl/$DOMAIN_2
+        read_only: true
+
+networks:
+  proxy:
+    name: proxy
+
+volumes:
+  logs:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/caddy/data/logs
+  domain_1_certs:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/caddy/etc/ssl/$DOMAIN_1
+  domain_2_certs:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/caddy/etc/ssl/$DOMAIN_2
+
+configs:
+  caddyfile:
+    content: |
+      # cloudflare origin ca
+      (domain_1_tls) {	
+        tls /etc/ssl/${DOMAIN_1}/${DOMAIN_1}.cert.pem /etc/ssl/${DOMAIN_1}/${DOMAIN_1}.key.pem
+      }
+
+      (domain_2_tls) {	
+        tls /etc/ssl/${DOMAIN_2}/${DOMAIN_2}.cert.pem /etc/ssl/${DOMAIN_2}/${DOMAIN_2}.key.pem
+      }
+
+      # first domain
+      ${DOMAIN_1} {
+        import  domain_1_tls
+
+        header /.well-known/matrix/* Content-Type application/json
+        header /.well-known/matrix/* Access-Control-Allow-Origin *
+        respond /.well-known/matrix/server `{"m.server": "matrix.${DOMAIN_1}:443"}`
+        respond /.well-known/matrix/client `{"m.homeserver":{"base_url":"https://matrix.${DOMAIN_1}"}}`
+
+        log {
+          output file /data/logs/${DOMAIN_1}/caddy.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        respond "👋"
+      }
+
+      cloud.${DOMAIN_1} {
+        import  domain_1_tls
+
+        # only allow logins from inside the tailnet
+        @nextcloudlogin {
+          path /login*
+          path /login/*
+          path /index.php/login
+          path /index.php/login/*
+          path /ocs/v1.php
+          path /ocs/v1.php/*
+          path /ocs/v2.php
+          path /ocs/v2.php/*
+        }
+        respond @nextcloudlogin "Access denied" 403
+
+        log {
+          output file /data/logs/${DOMAIN_1}/cloud.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        reverse_proxy https://nextcloud.${TAILNET_FQDN} {
+          # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+          # when proxying to https on a different domain, switch the header for SNI
+          header_up Host nextcloud.${TAILNET_FQDN}
+          header_down Host cloud.${DOMAIN_1}
+        }
+      }
+
+      matrix.${DOMAIN_1} {
+        import  domain_1_tls
+
+        log {
+          output file /data/logs/${DOMAIN_1}/matrix.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        reverse_proxy /_matrix/* http://homelab.${TAILNET_FQDN}:8008
+        reverse_proxy /_synapse/client/* http://homelab.${TAILNET_FQDN}:8008
+      }
+
+      git.${DOMAIN_1} {
+        import  domain_1_tls
+
+        log {
+          output file /data/logs/${DOMAIN_1}/git.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        reverse_proxy http://homelab.${TAILNET_FQDN}:3000
+      }
+
+      listen.${DOMAIN_1} {
+        import  domain_1_tls
+
+        @admin_path {
+          path /admin/*
+          path /System/Info
+          path /swagger
+        }
+        respond @admin_path "Access Denied" 403
+
+        log {
+          output file /data/logs/${DOMAIN_1}/listen.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        # From Gemini(!): Additional security headers
+        header {
+          # Disable FLoC tracking
+          Permissions-Policy "interest-cohort=()"
+          # Enable HSTS (Strict Transport Security)
+          Strict-Transport-Security "max-age=31536000;"
+          # Prevent browsers from sniffing MIME types
+          X-Content-Type-Options "nosniff"
+          # Clickjacking protection
+          X-Frame-Options "DENY"
+          X-XSS-Protection "1; mode=block"
+        }
+
+        reverse_proxy https://nextcloud.${TAILNET_FQDN}:8920 {
+          # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https
+          # when proxying to https on a different domain, switch the header for SNI
+          header_up Host nextcloud.${TAILNET_FQDN}
+          header_down Host cloud.${DOMAIN_1}
+
+          # From Gemini(!)
+          # Crucial for Jellyfin to see the real client IP for logs/security
+          header_up Host {host}
+          header_up X-Real-IP {remote_host}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto {scheme}
+        }
+      }
+
+      *.${DOMAIN_1} {
+        import	domain_1_tls
+
+        respond "Not found" 404
+
+        log {
+          output file /data/logs/${DOMAIN_1}.caddy.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+      }
+
+      # second domain
+      ${DOMAIN_2} {
+        import  domain_2_tls
+
+        header /.well-known/matrix/* Content-Type application/json
+        header /.well-known/matrix/* Access-Control-Allow-Origin *
+        respond /.well-known/matrix/server `{"m.server": "matrix.${DOMAIN_2}:443"}`
+        respond /.well-known/matrix/client `{"m.homeserver":{"base_url":"https://matrix.${DOMAIN_2}"}}`
+
+        log {
+          output file /data/logs/${DOMAIN_2}/caddy.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        respond "👋"
+      }
+
+      matrix.${DOMAIN_2} {
+        import  domain_2_tls
+
+        log {
+          output file /data/logs/${DOMAIN_2}/matrix.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+
+        reverse_proxy /_matrix/* http://homelab.${TAILNET_FQDN}:8008
+        reverse_proxy /_synapse/client/* http://homelab.${TAILNET_FQDN}:8008
+      }
+
+      *.${DOMAIN_2} {
+        import	domain_2_tls
+
+        respond "Not found" 404
+
+        log {
+          output file /data/logs/${DOMAIN_2}.caddy.log
+          format filter {
+            request>headers>User-Agent delete
+          }
+        }
+      }

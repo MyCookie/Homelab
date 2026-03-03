@@ -98,12 +98,12 @@ services:
         target: /config
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH/Torrents
+        source: $DOWNLOAD_PATH
         target: /downloads
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH/Servarr/Torrents
-        target: /downloads/servarr
+        source: $DOWNLOAD_PATH
+        target: /downloads
         read_only: false
 
   sabnzbd:
@@ -130,8 +130,8 @@ services:
         target: /config
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH/NZB
-        target: /nzb
+        source: $DOWNLOAD_PATH
+        target: /downloads
         read_only: false
 
   prowlarr:
@@ -209,8 +209,8 @@ services:
         target: /library/movies
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH/Servarr/Torrents
-        target: /downloads/servarr
+        source: $DOWNLOAD_PATH
+        target: /downloads
         read_only: true
 
   sonarr:
@@ -239,8 +239,8 @@ services:
         target: /library/tv
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH/Servarr/Torrents
-        target: /downloads/servarr
+        source: $DOWNLOAD_PATH
+        target: /downloads
         read_only: true
 
   lidarr:
@@ -269,8 +269,8 @@ services:
         target: /library/music
         read_only: false
       - type: bind
-        source: $DOWNLOAD_PATH/Servarr/Torrents
-        target: /downloads/servarr
+        source: $DOWNLOAD_PATH
+        target: /downloads
         read_only: true
 
   jellyfin:
@@ -290,11 +290,6 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      ## TODO: move cache to /config/cache before deploying
-      # - type: bind
-      #   source: $VOLUMES_PATH/jellyfin/cache
-      #   target: /cache
-      #   read_only: false
       - type: bind
         source: $VOLUMES_PATH/jellyfin/config
         target: /config

@@ -1,8 +1,5 @@
 name: servarr
 
-include:
-  - networks/servarr.yaml
-
 services:
   # This follows hotios guides for setting up 'arrs in docker
   # https://hotio.dev/
@@ -72,7 +69,10 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1 #
       - net.ipv6.conf.all.disable_ipv6=1 #
     volumes:
-      - $VOLUMES_PATH/servarr/config:/config
+      - type: volume
+        source: servarr_config
+        target: /config
+        read_only: false
 
   qbittorrent:
     image: ghcr.io/hotio/qbittorrent
@@ -93,16 +93,12 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/qbittorrent/config
+      - type: volume
+        source: qbittorrent_config
         target: /config
         read_only: false
-      - type: bind
-        source: $DOWNLOAD_PATH
-        target: /downloads
-        read_only: false
-      - type: bind
-        source: $DOWNLOAD_PATH
+      - type: volume
+        source: downloads
         target: /downloads
         read_only: false
 
@@ -125,12 +121,12 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/sabnzbd/config
+      - type: volume
+        source: sabnzbd_config
         target: /config
         read_only: false
-      - type: bind
-        source: $DOWNLOAD_PATH
+      - type: volume
+        source: downloads
         target: /downloads
         read_only: false
 
@@ -151,35 +147,8 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/prowlarr/config
-        target: /config
-        read_only: false
-
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    container_name: flaresolverr
-    restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
-    network_mode: "service:servarr"
-    env_file:
-      - env/servarr.env
-    environment:
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - LOG_FILE=${LOG_FILE:-none}
-      - LOG_HTML=${LOG_HTML:-false}
-      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-    healthcheck:
-      test: ["CMD", "pgrep", "-f", "python"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    volumes:
-      - type: bind
-        source: $VOLUMES_PATH/flaresolverr/config
+      - type: volume
+        source: prowlarr_config
         target: /config
         read_only: false
 
@@ -200,16 +169,16 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/radarr/config
+      - type: volume
+        source: radarr_config
         target: /config
         read_only: false
-      - type: bind
-        source: $LIBRARY_PATH/Movies
+      - type: volume
+        source: movies
         target: /library/movies
         read_only: false
-      - type: bind
-        source: $DOWNLOAD_PATH
+      - type: volume
+        source: downloads
         target: /downloads
         read_only: true
 
@@ -230,16 +199,16 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/sonarr/config
+      - type: volume
+        source: sonarr_config
         target: /config
         read_only: false
-      - type: bind
-        source: $LIBRARY_PATH/TV
+      - type: volume
+        source: tv
         target: /library/tv
         read_only: false
-      - type: bind
-        source: $DOWNLOAD_PATH
+      - type: volume
+        source: downloads
         target: /downloads
         read_only: true
 
@@ -260,16 +229,16 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/lidarr/config
+      - type: volume
+        source: lidarr_config
         target: /config
         read_only: false
-      - type: bind
-        source: $LIBRARY_PATH/Music
+      - type: volume
+        source: music
         target: /library/music
         read_only: false
-      - type: bind
-        source: $DOWNLOAD_PATH
+      - type: volume
+        source: downloads
         target: /downloads
         read_only: true
 
@@ -290,19 +259,99 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/jellyfin/config
+      - type: volume
+        source: jellyfin_config
         target: /config
         read_only: false
-      - type: bind
-        source: $MEDIA_PATH
+      - type: volume
+        source: library
         target: /library
         read_only: true
-      - type: bind
-        source: $DOWNLOAD_PATH
+      - type: volume
+        source: downloads
         target: /downloads
         read_only: true
 
 networks:
   servarr:
     name: servarr
+
+volumes:
+  downloads:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${DOWNLOAD_PATH}"
+  library:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${LIBRARY_PATH}"
+  movies:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${LIBRARY_PATH}/Movies"
+  music:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${LIBRARY_PATH}/Music"
+  tv:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${LIBRARY_PATH}/TV"
+  servarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/servarr/config"
+  prowlarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/prowlarr/config"
+  radarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/radarr/config"
+  sonarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/sonarr/config"
+  lidarr_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/lidarr/config"
+  sabnzbd_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/sabnzbd/config"
+  qbittorrent_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/qbittorrent/config"
+  jellyfin_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH}/jellyfin/config"

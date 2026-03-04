@@ -7,20 +7,49 @@ services:
     container_name: tailscale
     restart: no
     hostname: tailscale
+    cap_add:
+      - net_admin
+      - sys_module
+    devices:
+      - /dev/net/tun:/dev/net/tun
     networks:
       - nextcloud
     env_file: services/env/tailscale.env
-    volumes:
-      - type: bind
-        source: $VOLUMES_PATH/tailscale/etc/tailscale/serve/nextcloud.conf
+    configs:
+      - source:
         target: /etc/tailscale/serve/nextcloud.conf
-        read_only: false
+    volumes:
       - type: bind
         source: $VOLUMES_PATH/tailscale/var/lib/tailscale
         target: /var/lib/tailscale
         read_only: false
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - sys_module
+
+configs:
+  tailscale:
+    content: |
+      {
+        "TCP": {
+          "443": {
+            "HTTPS": true
+          },
+          "8920": {
+            "HTTPS": true
+          }
+        },
+        "Web": {
+          "nextcloud.${TAILNET_FQDN}:443": {
+            "Handlers": {
+              "/": {
+                "Proxy": "http://localhost:80"
+              }
+            }
+          },
+          "nextcloud.${TAILNET_FQDN}:8920": {
+            "Handlers": {
+              "/": {
+                "Proxy": "http://localhost:8096"
+              }
+            }
+          }
+        }
+      }

@@ -2,8 +2,8 @@ name: nextcloud
 
 include:
   # networks
-  - services/networks/homelab.yaml
-  - services/networks/nextcloud.yaml
+  - networks/homelab.yaml
+  - networks/nextcloud.yaml
   # services
   - services/audiobookshelf.yaml
   - services/database.yaml

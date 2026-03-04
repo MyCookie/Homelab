@@ -11,7 +11,7 @@ services:
       - /dev/net/tun:/dev/net/tun
     networks:
       - nextcloud
-    env_file: services/env/tailscale.env
+    env_file: env/tailscale.env
     configs:
       - source:
         target: /etc/tailscale/serve/nextcloud.conf

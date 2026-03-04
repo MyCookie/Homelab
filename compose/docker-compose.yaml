@@ -13,6 +13,19 @@ include:
   - services/openwebui.yaml
 
 services:
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower
+    container_name: watchtower
+    hostname: watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_CLEANUP_VOLUMES=true
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+
   tailscale:
     image: tailscale/tailscale
     container_name: tailscale

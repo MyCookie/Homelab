@@ -1,16 +1,19 @@
 name: nextcloud
 
 include:
+  # networks
+  - services/networks/homelab.yaml
   - services/networks/nextcloud.yaml
+  # services
   - services/audiobookshelf.yaml
+  - services/database.yaml
   - services/forgejo.yaml
   - services/jellyfin.yaml
   - services/minio.yaml
-  - services/nextcloud.yaml
-  - services/database.yaml
   - services/models.yaml
-  - services/synapse.yaml
+  - services/nextcloud.yaml
   - services/openwebui.yaml
+  - services/synapse.yaml
   - services/tailscale.yaml
 
 services:

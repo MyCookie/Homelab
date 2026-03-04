@@ -1,7 +1,3 @@
-include:
-  - networks/nextcloud.yaml
-  - database.yaml
-
 services:
   nextcloud:
     image: nextcloud:31

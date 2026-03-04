@@ -1,6 +1,3 @@
-include:
-  - networks/homelab.yaml
-
 services:
   synapse:
     image: matrixdotorg/synapse

@@ -1,6 +1,3 @@
-include:
-  - networks/homelab.yaml
-
 services:
   youtubedl:
     image: tzahi12345/youtubedl-material

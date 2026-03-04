@@ -1,7 +1,3 @@
-include:
-  - networks/nextcloud.yaml
-  - networks/homelab.yaml
-
 services:
   ollama:
     image: ollama/ollama

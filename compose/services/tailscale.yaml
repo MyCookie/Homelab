@@ -1,6 +1,3 @@
-include:
-  - networks/nextcloud.yaml
-
 services:
   tailscale:
     image: tailscale/tailscale

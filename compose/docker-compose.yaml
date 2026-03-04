@@ -11,6 +11,7 @@ include:
   - services/models.yaml
   - services/synapse.yaml
   - services/openwebui.yaml
+  - services/tailscale.yaml
 
 services:
   watchtower:
@@ -25,26 +26,3 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
-
-  tailscale:
-    image: tailscale/tailscale
-    container_name: tailscale
-    restart: no
-    hostname: tailscale
-    networks:
-      - nextcloud
-    env_file: services/env/tailscale.env
-    volumes:
-      - type: bind
-        source: $VOLUMES_PATH/tailscale/etc/tailscale/serve/nextcloud.conf
-        target: /etc/tailscale/serve/nextcloud.conf
-        read_only: false
-      - type: bind
-        source: $VOLUMES_PATH/tailscale/var/lib/tailscale
-        target: /var/lib/tailscale
-        read_only: false
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - sys_module

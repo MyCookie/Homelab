@@ -312,46 +312,46 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/servarr/config"
+      device: ":${VOLUMES_PATH_REMOTE}/servarr/config"
   prowlarr_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/prowlarr/config"
+      device: ":${VOLUMES_PATH_REMOTE}/prowlarr/config"
   radarr_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/radarr/config"
+      device: ":${VOLUMES_PATH_REMOTE}/radarr/config"
   sonarr_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/sonarr/config"
+      device: ":${VOLUMES_PATH_REMOTE}/sonarr/config"
   lidarr_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/lidarr/config"
+      device: ":${VOLUMES_PATH_REMOTE}/lidarr/config"
   sabnzbd_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/sabnzbd/config"
+      device: ":${VOLUMES_PATH_REMOTE}/sabnzbd/config"
   qbittorrent_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/qbittorrent/config"
+      device: ":${VOLUMES_PATH_REMOTE}/qbittorrent/config"
   jellyfin_config:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=4
-      device: ":${VOLUMES_PATH}/jellyfin/config"
+      device: ":${VOLUMES_PATH_REMOTE}/jellyfin/config"

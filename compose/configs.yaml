@@ -1,0 +1,29 @@
+configs:
+  tailscale_serve:
+    content: |
+      {
+        "TCP": {
+          "443": {
+            "HTTPS": true
+          },
+          "8920": {
+            "HTTPS": true
+          }
+        },
+        "Web": {
+          "nextcloud.${TAILNET_FQDN}:443": {
+            "Handlers": {
+              "/": {
+                "Proxy": "http://localhost:80"
+              }
+            }
+          },
+          "nextcloud.${TAILNET_FQDN}:8920": {
+            "Handlers": {
+              "/": {
+                "Proxy": "http://localhost:8096"
+              }
+            }
+          }
+        }
+      }

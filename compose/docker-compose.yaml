@@ -1,6 +1,8 @@
 name: nextcloud
 
 include:
+  # configs
+  - configs.yaml
   # networks
   - networks/homelab.yaml
   - networks/nextcloud.yaml

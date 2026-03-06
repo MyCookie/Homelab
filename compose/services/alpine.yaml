@@ -1,0 +1,25 @@
+# service template
+services:
+  alpine:
+    image: alpine
+    container_name: alpine
+    hostname: alpine
+    restart: no
+    user: $UID:$GID
+    networks:
+      - homelab
+    environment:
+      - TZ=$TIMEZONE
+    volumes:
+      - type: bind
+        source: alpine
+        target: /root
+        read_only: false
+
+volumes:
+  alpine:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/alpine/root

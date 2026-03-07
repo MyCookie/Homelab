@@ -283,6 +283,24 @@ volumes:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=3
       device: ":${DOWNLOAD_PATH}"
+  torrents:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${DOWNLOAD_PATH}/Torrents"
+  torrents_servarr:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${DOWNLOAD_PATH}/Torrents"
+  nzb_downloads:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${DOWNLOAD_PATH}/NZB"
   library:
     driver: local
     driver_opts:

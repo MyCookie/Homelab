@@ -98,8 +98,12 @@ services:
         target: /config
         read_only: false
       - type: volume
-        source: downloads
+        source: torrents
         target: /downloads
+        read_only: false
+      - type: volume
+        source: torrents_servarr
+        target: /downloads/servarr
         read_only: false
 
   sabnzbd:
@@ -126,8 +130,8 @@ services:
         target: /config
         read_only: false
       - type: volume
-        source: downloads
-        target: /downloads
+        source: nzb_downloads
+        target: /nzb
         read_only: false
 
   prowlarr:
@@ -177,10 +181,14 @@ services:
         source: movies
         target: /library/movies
         read_only: false
-      - type: volume
-        source: downloads
-        target: /downloads
+      - type: bind
+        source: torrents_servarr
+        target: /downloads/servarr
         read_only: true
+      - type: bind
+        source: nzb_downloads
+        target: /nzb
+        read_only: false
 
   sonarr:
     image: ghcr.io/hotio/sonarr
@@ -207,10 +215,14 @@ services:
         source: tv
         target: /library/tv
         read_only: false
-      - type: volume
-        source: downloads
-        target: /downloads
+      - type: bind
+        source: torrents_servarr
+        target: /downloads/servarr
         read_only: true
+      - type: bind
+        source: nzb_downloads
+        target: /nzb
+        read_only: false
 
   lidarr:
     image: ghcr.io/hotio/lidarr
@@ -237,10 +249,14 @@ services:
         source: music
         target: /library/music
         read_only: false
-      - type: volume
-        source: downloads
-        target: /downloads
+      - type: bind
+        source: torrents_servarr
+        target: /downloads/servarr
         read_only: true
+      - type: bind
+        source: nzb_downloads
+        target: /nzb
+        read_only: false
 
   jellyfin:
     image: ghcr.io/hotio/jellyfin
@@ -294,7 +310,7 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${DOWNLOAD_PATH}/Torrents"
+      device: ":${DOWNLOAD_PATH}/Servarr/Torrents"
   nzb_downloads:
     driver: local
     driver_opts:

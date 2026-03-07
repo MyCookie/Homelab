@@ -6,17 +6,21 @@ include:
   # networks
   - networks/homelab.yaml
   - networks/nextcloud.yaml
-  # services
-  - services/audiobookshelf.yaml
+  # dependencies
   - services/database.yaml
-  - services/forgejo.yaml
-  - services/jellyfin.yaml
   - services/minio.yaml
   - services/models.yaml
+  # nextcloud
+  - services/jellyfin.yaml
   - services/nextcloud.yaml
+  - services/tailscale.yaml
+  # services
+  - services/audiobookshelf.yaml
+  - services/forgejo.yaml
   - services/openwebui.yaml
   - services/synapse.yaml
-  - services/tailscale.yaml
+  # clan services
+  - services/cookies.yaml
 
 services:
   watchtower:

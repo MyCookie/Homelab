@@ -10,7 +10,7 @@ services:
   #   --env-file .env \
   #   --env-file env/cookies.env \
   #   pgautoupgrade/pgautoupgrade:13-alpine
-  postgres:
+  postgres-cookies:
     image: postgres:14-alpine
     container_name: postgres-cookies
     hostname: postgres
@@ -27,7 +27,7 @@ services:
         target: /var/lib/postgresql/data
         read_only: false
 
-  gitea:
+  gitea-cookies:
     image: gitea/gitea
     container_name: gitea-cookies
     restart: unless-stopped
@@ -51,7 +51,7 @@ services:
         target: /data
         read_only: false
 
-  synapse:
+  synapse-cookies:
     image: matrixdotorg/synapse
     container_name: synapse-cookies
     hostname: synapse

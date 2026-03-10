@@ -181,11 +181,11 @@ services:
         source: movies
         target: /library/movies
         read_only: false
-      - type: bind
+      - type: volume
         source: torrents_servarr
         target: /downloads/servarr
         read_only: true
-      - type: bind
+      - type: volume
         source: nzb_downloads
         target: /nzb
         read_only: false
@@ -215,11 +215,11 @@ services:
         source: tv
         target: /library/tv
         read_only: false
-      - type: bind
+      - type: volume
         source: torrents_servarr
         target: /downloads/servarr
         read_only: true
-      - type: bind
+      - type: volume
         source: nzb_downloads
         target: /nzb
         read_only: false
@@ -249,11 +249,11 @@ services:
         source: music
         target: /library/music
         read_only: false
-      - type: bind
+      - type: volume
         source: torrents_servarr
         target: /downloads/servarr
         read_only: true
-      - type: bind
+      - type: volume
         source: nzb_downloads
         target: /nzb
         read_only: false

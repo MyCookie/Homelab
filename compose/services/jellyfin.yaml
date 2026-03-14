@@ -13,8 +13,6 @@ services:
     #   - $RENDER_GROUP_ID
     # devices:
     #   - /dev/dri/renderD128:/dev/dri/renderD128
-    depends_on:
-      - tailscale
     volumes:
       - type: bind
         source: $VOLUMES_PATH/jellyfin/cache

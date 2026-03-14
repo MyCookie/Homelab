@@ -258,35 +258,35 @@ services:
         target: /nzb
         read_only: false
 
-  jellyarr:
-    image: ghcr.io/hotio/jellyfin
-    container_name: jellyarr
-    restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
-    network_mode: "service:servarr"
-    env_file:
-      - ./servarr.env
-    healthcheck:
-      test: ["CMD", "curl", "-f", "localhost:8096/health"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    volumes:
-      - type: volume
-        source: jellyfin_config
-        target: /config
-        read_only: false
-      - type: volume
-        source: library
-        target: /library
-        read_only: true
-      - type: volume
-        source: downloads
-        target: /downloads
-        read_only: true
+  # jellyarr:
+  #   image: ghcr.io/hotio/jellyfin
+  #   container_name: jellyarr
+  #   restart: no
+  #   depends_on:
+  #     servarr:
+  #       condition: service_healthy
+  #   network_mode: "service:servarr"
+  #   env_file:
+  #     - ./servarr.env
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "localhost:8096/health"]
+  #     interval: 1m
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 30s
+  #   volumes:
+  #     - type: volume
+  #       source: jellyfin_config
+  #       target: /config
+  #       read_only: false
+  #     - type: volume
+  #       source: library
+  #       target: /library
+  #       read_only: true
+  #     - type: volume
+  #       source: downloads
+  #       target: /downloads
+  #       read_only: true
 
 networks:
   servarr:

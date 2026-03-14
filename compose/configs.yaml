@@ -21,7 +21,7 @@ configs:
           "nextcloud.${TAILNET_FQDN}:8920": {
             "Handlers": {
               "/": {
-                "Proxy": "http://localhost:8096"
+                "Proxy": "http://jellyfin:8096"
               }
             }
           }

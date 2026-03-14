@@ -4,7 +4,10 @@ services:
     container_name: jellyfin
     restart: no
     user: $UID:$GID
-    network_mode: service:tailscale
+    networks:
+      - nextcloud
+    ports:
+      - 8096:8096
     # Uncomment for QuickSync transcode
     # group_add:
     #   - $RENDER_GROUP_ID

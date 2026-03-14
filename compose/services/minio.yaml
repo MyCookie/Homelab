@@ -2,7 +2,7 @@ services:
   minio:
     image: quay.io/minio/minio
     restart: no
-    user: 473:473 # scale app defaults to this id
+    user: $UID:$GID
     container_name: minio
     command: 'server /data --console-address ":9001"'
     healthcheck:

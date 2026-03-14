@@ -4,7 +4,6 @@ services:
     container_name: kima
     hostname: kima
     restart: no
-    user: $UID:$GID
     networks:
       - homelab
     ports:
@@ -21,9 +20,9 @@ services:
         read_only: false
       - type: bind
         source: $MEDIA_PATH/Music
-        target: /library/music
+        target: /music/library
         read_only: true
       - type: bind
         source: $MEDIA_PATH/Soundtracks
-        target: /library/soundtracks
+        target: /music/soundtracks
         read_only: true

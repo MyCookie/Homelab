@@ -17,6 +17,7 @@ include:
   # services
   - services/audiobookshelf.yaml
   - services/forgejo.yaml
+  - services/kima-hub.yaml
   - services/openwebui.yaml
   - services/synapse.yaml
   # clan services

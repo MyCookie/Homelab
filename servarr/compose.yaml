@@ -69,8 +69,8 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1 #
       - net.ipv6.conf.all.disable_ipv6=1 #
     volumes:
-      - type: volume
-        source: servarr_config
+      - type: bind
+        source: $VOLUMES_PATH/servarr/config
         target: /config
         read_only: false
 
@@ -93,18 +93,15 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: volume
-        source: qbittorrent_config
+      - type: bind
+        source: $VOLUMES_PATH/qbittorrent/config
         target: /config
-        read_only: false
-      - type: volume
-        source: torrents
-        target: /downloads
-        read_only: false
-      - type: volume
-        source: torrents_servarr
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
         target: /downloads/servarr
-        read_only: false
+      - type: bind
+        source: $DOWNLOAD_PATH/Torrents
+        target: /downloads
 
   sabnzbd:
     image: ghcr.io/hotio/sabnzbd
@@ -125,14 +122,12 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: volume
-        source: sabnzbd_config
+      - type: bind
+        source: $VOLUMES_PATH/sabnzbd/config
         target: /config
-        read_only: false
-      - type: volume
-        source: nzb_downloads
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
         target: /nzb
-        read_only: false
 
   prowlarr:
     image: ghcr.io/hotio/prowlarr
@@ -151,10 +146,9 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: volume
-        source: prowlarr_config
+      - type: bind
+        source: $VOLUMES_PATH/prowlarr/config
         target: /config
-        read_only: false
 
   radarr:
     image: ghcr.io/hotio/radarr
@@ -173,22 +167,20 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: volume
-        source: radarr_config
+      - type: bind
+        source: $VOLUMES_PATH/radarr/config
         target: /config
-        read_only: false
-      - type: volume
-        source: movies
+      - type: bind
+        source: $LIBRARY_PATH/Movies
         target: /library/movies
-        read_only: false
-      - type: volume
-        source: torrents_servarr
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
         target: /downloads/servarr
         read_only: true
-      - type: volume
-        source: nzb_downloads
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
         target: /nzb
-        read_only: false
+        read_only: true
 
   sonarr:
     image: ghcr.io/hotio/sonarr
@@ -207,22 +199,20 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: volume
-        source: sonarr_config
+      - type: bind
+        source: $VOLUMES_PATH/sonarr/config
         target: /config
-        read_only: false
-      - type: volume
-        source: tv
+      - type: bind
+        source: $LIBRARY_PATH/TV
         target: /library/tv
-        read_only: false
-      - type: volume
-        source: torrents_servarr
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
         target: /downloads/servarr
         read_only: true
-      - type: volume
-        source: nzb_downloads
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
         target: /nzb
-        read_only: false
+        read_only: true
 
   lidarr:
     image: ghcr.io/hotio/lidarr
@@ -241,26 +231,24 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - type: volume
-        source: lidarr_config
+      - type: bind
+        source: $VOLUMES_PATH/lidarr/config
         target: /config
-        read_only: false
-      - type: volume
-        source: music
+      - type: bind
+        source: $LIBRARY_PATH/Music
         target: /library/music
-        read_only: false
-      - type: volume
-        source: torrents_servarr
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
         target: /downloads/servarr
         read_only: true
-      - type: volume
-        source: nzb_downloads
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
         target: /nzb
-        read_only: false
+        read_only: true
 
-  # jellyarr:
+  # jellyfin:
   #   image: ghcr.io/hotio/jellyfin
-  #   container_name: jellyarr
+  #   container_name: jellyfin
   #   restart: no
   #   depends_on:
   #     servarr:
@@ -299,90 +287,12 @@ volumes:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=3
       device: ":${DOWNLOAD_PATH}"
-  torrents:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${DOWNLOAD_PATH}/Torrents"
-  torrents_servarr:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${DOWNLOAD_PATH}/Servarr/Torrents"
-  nzb_downloads:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${DOWNLOAD_PATH}/NZB"
   library:
     driver: local
     driver_opts:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=3
       device: ":${LIBRARY_PATH}"
-  movies:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${LIBRARY_PATH}/Movies"
-  music:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${LIBRARY_PATH}/Music"
-  tv:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${LIBRARY_PATH}/TV"
-  servarr_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/servarr/config"
-  prowlarr_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/prowlarr/config"
-  radarr_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/radarr/config"
-  sonarr_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/sonarr/config"
-  lidarr_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/lidarr/config"
-  sabnzbd_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/sabnzbd/config"
-  qbittorrent_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/qbittorrent/config"
   jellyfin_config:
     driver: local
     driver_opts:

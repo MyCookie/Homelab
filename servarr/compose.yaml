@@ -281,21 +281,21 @@ networks:
     name: servarr
 
 volumes:
-  downloads:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${DOWNLOAD_PATH}"
-  library:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${LIBRARY_PATH}"
-  jellyfin_config:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
-      device: ":${VOLUMES_PATH_REMOTE}/jellyfin/config"
+  # downloads:
+  #   driver: local
+  #   driver_opts:
+  #     type: nfs
+  #     o: addr=$STORAGE_IPV4,rw,nfsvers=3
+  #     device: ":${DOWNLOAD_PATH}"
+  # library:
+  #   driver: local
+  #   driver_opts:
+  #     type: nfs
+  #     o: addr=$STORAGE_IPV4,rw,nfsvers=3
+  #     device: ":${LIBRARY_PATH}"
+  # jellyfin_config:
+  #   driver: local
+  #   driver_opts:
+  #     type: nfs
+  #     o: addr=$STORAGE_IPV4,rw,nfsvers=3
+  #     device: ":${VOLUMES_PATH_REMOTE}/jellyfin/config"

@@ -31,7 +31,6 @@ services:
       - "8088:8088" # qbittorrent
       - "8888:8888" # sabnzbd
       - "9696:9696" # prowlarr
-      - "8191:8191" # flaresolverr
       - "7878:7878" # radarr
       - "8686:8686" # lidarr
       - "8989:8989" # sonarr
@@ -45,7 +44,7 @@ services:
       - VPN_LAN_NETWORK=192.168.0.0/16,100.64.0.0/10
       - VPN_LAN_LEAK_ENABLED=false
       # Add ports to the list below to open them over LAN
-      - VPN_EXPOSE_PORTS_ON_LAN=9696/tcp,8191/tcp,7878/tcp,8686/tcp,8989/tcp,8088/tcp,8888/tcp
+      - VPN_EXPOSE_PORTS_ON_LAN=9696/tcp,7878/tcp,8686/tcp,8989/tcp,8088/tcp,8888/tcp
       - VPN_AUTO_PORT_FORWARD=false
       - VPN_AUTO_PORT_FORWARD_TO_PORTS=
       - VPN_FIREWALL_TYPE=auto

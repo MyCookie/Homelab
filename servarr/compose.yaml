@@ -24,6 +24,7 @@ services:
     container_name: servarr
     hostname: servarr
     restart: no
+    user: $UID:$GID
     networks:
       - servarr
     # Ports will be routed through this container
@@ -77,6 +78,7 @@ services:
     image: ghcr.io/hotio/qbittorrent
     container_name: qbittorrent
     restart: no
+    user: $UID:$GID
     depends_on:
       servarr:
         condition: service_healthy
@@ -106,6 +108,7 @@ services:
     image: ghcr.io/hotio/sabnzbd
     container_name: sabnzbd
     restart: no
+    user: $UID:$GID
     depends_on:
       servarr:
         condition: service_healthy
@@ -132,6 +135,7 @@ services:
     image: ghcr.io/hotio/prowlarr
     container_name: prowlarr
     restart: no
+    user: $UID:$GID
     depends_on:
       servarr:
         condition: service_healthy
@@ -153,6 +157,7 @@ services:
     image: ghcr.io/hotio/radarr
     container_name: radarr
     restart: no
+    user: $UID:$GID
     depends_on:
       servarr:
         condition: service_healthy
@@ -185,6 +190,7 @@ services:
     image: ghcr.io/hotio/sonarr
     container_name: sonarr
     restart: no
+    user: $UID:$GID
     depends_on:
       servarr:
         condition: service_healthy
@@ -217,6 +223,7 @@ services:
     image: ghcr.io/hotio/lidarr
     container_name: lidarr
     restart: no
+    user: $UID:$GID
     depends_on:
       servarr:
         condition: service_healthy

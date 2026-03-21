@@ -14,6 +14,14 @@ services:
       - nextcloud
       - homelab
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH_HDD/minio/data
+      - type: volume
+        source: minio
         target: /data
+
+volumes:
+  minio:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${VOLUMES_PATH_REMOTE}/minio/data"

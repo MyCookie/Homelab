@@ -9,7 +9,6 @@ include:
   # dependencies
   - services/database.yaml
   - services/minio.yaml
-  - services/models.yaml
   # nextcloud
   - services/jellyfin.yaml
   - services/nextcloud.yaml
@@ -18,7 +17,6 @@ include:
   - services/audiobookshelf.yaml
   - services/forgejo.yaml
   - services/kima-hub.yaml
-  - services/openwebui.yaml
   - services/synapse.yaml
   # clan services
   - services/cookies.yaml

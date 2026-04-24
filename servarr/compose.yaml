@@ -264,7 +264,7 @@ services:
       start_period: 30s
     volumes:
       - type: bind
-        source: $VOLUMES_PATH/radarr/config
+        source: $VOLUMES_PATH/bazarr/config
         target: /config
       - type: bind
         source: $LIBRARY_PATH/Movies

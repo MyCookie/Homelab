@@ -247,7 +247,7 @@ services:
         read_only: false
 
   bazarr:
-    iamge: ghcr.io/hotio/bazarr
+    image: ghcr.io/hotio/bazarr
     container_name: bazarr
     restart: no
     depends_on:
@@ -257,7 +257,7 @@ services:
     env_file:
       - ./servarr.env
     healthcheck:
-      test: ["CMD", "pgrep", "-f", "Lidarr"]
+      test: ["CMD", "pgrep", "-f", "python3"]
       interval: 1m
       timeout: 10s
       retries: 3

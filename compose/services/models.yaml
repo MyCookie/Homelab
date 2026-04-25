@@ -2,7 +2,7 @@ services:
   ollama:
     image: ollama/ollama
     container_name: ollama
-    restart: always
+    restart: unless-stopped
     # Uncomment for Intel
     # group_add:
     #   - $RENDER_GROUP_ID

@@ -28,3 +28,18 @@ services:
         source: $VOLUMES_PATH/ollama/root/.ollama
         target: /root/.ollama
         read_only: false
+
+  whisper.cpp:
+    image: ghcr.io/ggml-org/whisper.cpp:main
+    container_name: whispercpp
+    restart: unless-stopped
+    networks:
+      - nextcloud
+      - homelab
+    ports:
+      - 9000:9000
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/whisper.cpp/models
+        target: /models
+        read_only: false

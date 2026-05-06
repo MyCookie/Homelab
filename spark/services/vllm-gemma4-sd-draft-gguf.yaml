@@ -19,6 +19,6 @@ services:
       - ~/.cache/huggingface:/root/.cache/huggingface:ro
     command: >
       ggml-org/gemma-4-31B-it-GGUF:Q8_0
-      --max-model-len 256000
+      --max-model-len 131072
       --gpu-memory-utilization 0.8
       --speculative-config '{"model": "ggml-org/gemma-4-26B-A4B-it-GGUF:Q8_0  ", "num_speculative_tokens": 5, "method": "draft_model"}'

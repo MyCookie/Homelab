@@ -1,0 +1,29 @@
+services:
+  # vllm does not load gpt-oss-20b into similar kv cache window when used as a draft model
+  # AssertionError: All drafting layers should belong to the same kv cache group"
+  # https://github.com/vllm-project/vllm/issues/33133
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    image: vllm/vllm-openai
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - VLLM_USE_FLASHINFER_MOE_MXFP4_MXFP8=1
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface:ro
+    # by default, the image entrypoint is 'vllm serve'
+    command: >
+      openai/gpt-oss-120b
+      --max-model-len 131072
+      --gpu-memory-utilization 0.85
+      --speculative-config '{"model": "openai/gpt-oss-20b", "num_speculative_tokens": 5, "method": "draft_model"}'

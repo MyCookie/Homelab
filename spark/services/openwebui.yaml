@@ -1,0 +1,28 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: no
+    networks:
+      - spark
+    hostname: openwebui
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - open-webui:/app/backend/data
+
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    container_name: open-terminal
+    restart: no
+    networks:
+      - spark
+    hostname: open-terminal
+    environment:
+      - OPEN_TERMINAL_API_KEY=your-secret-key
+    volumes:
+      - open-terminal:/home/user
+
+volumes:
+  open-webui:
+  open-terminal:

@@ -1,0 +1,27 @@
+services:
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    image: vllm/vllm-openai # v0.20.0 or higher
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface:ro
+    # model supports a maximum context of 262144
+    command: >
+      unsloth/Qwen3-Coder-Next-FP8 \
+        --max-model-len 131072 \
+        --gpu-memory-utilization 0.8 \
+        --tensor-parallel-size 2 \
+        --enable-auto-tool-choice \
+        --tool-call-parser qwen3_coder

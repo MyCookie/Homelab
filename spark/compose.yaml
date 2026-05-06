@@ -1,0 +1,20 @@
+name: spark
+
+include:
+  - services/openwebui.yaml
+  - services/ollama.yaml
+
+services:
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower
+    container_name: watchtower
+    hostname: watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_CLEANUP_VOLUMES=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  spark:

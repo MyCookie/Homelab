@@ -1,0 +1,36 @@
+services:
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    image: nvcr.io/nvidia/vllm:${LATEST_VLLM_VERSION}
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface:ro
+    command: >
+      nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-NVFP4 \
+      --served-model-name nvidia/nemotron-3-super \
+      --async-scheduling \
+      --dtype auto \
+      --max-model-len 262144 \
+      --swap-space 0 \
+      --trust-remote-code \
+      --kv-cache-dtype fp8 \
+      --gpu-memory-utilization 0.9 \
+      --max-cudagraph-capture-size 128 \
+      --enable-chunked-prefill \
+      --mamba-ssm-cache-dtype float16 \
+      --reasoning-parser-plugin /app/super_v3_reasoning_parser.py \
+      --reasoning-parser super_v3 \
+      --enable-auto-tool-choice \
+      --tool-call-parser qwen3_coder

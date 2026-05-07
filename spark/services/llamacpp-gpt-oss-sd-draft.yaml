@@ -18,11 +18,11 @@ services:
       - LLAMA_ARG_CTX_SIZE=131072
       - LLAMA_ARG_BATCH=2042
       - LLAMA_ARG_UBATCH=2042
-      - LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120B-GGUF
+      - LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
       - LLAMA_ARG_HOST=0.0.0.0
       - LLAMA_ARG_PORT=8000
       - LLAMA_ARG_WEBUI=0
       - LLAMA_ARG_THINK_BUDGET_MESSAGE='... thinking budget exceeded, need to answer.\n'
-      - LLAMA_ARG_SPEC_DRAFT_HF_REPO=ggml-org/gpt-oss-20B-GGUF
+      - LLAMA_ARG_SPEC_DRAFT_HF_REPO=ggml-org/gpt-oss-20b-GGUF
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface:ro

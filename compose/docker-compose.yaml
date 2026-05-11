@@ -17,8 +17,6 @@ include:
   - services/audiobookshelf.yaml
   - services/forgejo.yaml
   - services/synapse.yaml
-  # clan services
-  - services/cookies.yaml
 
 services:
   watchtower:

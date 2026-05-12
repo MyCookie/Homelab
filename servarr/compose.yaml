@@ -100,9 +100,6 @@ services:
     image: ghcr.io/hotio/sabnzbd
     container_name: sabnzbd
     restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
     networks:
       - servarr
     ports:
@@ -129,9 +126,6 @@ services:
     image: ghcr.io/hotio/prowlarr
     container_name: prowlarr
     restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
     networks:
       - servarr
     ports:
@@ -153,9 +147,6 @@ services:
     image: ghcr.io/hotio/radarr
     container_name: radarr
     restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
     networks:
       - servarr
     ports:
@@ -188,9 +179,6 @@ services:
     image: ghcr.io/hotio/sonarr
     container_name: sonarr
     restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
     networks:
       - servarr
     ports:
@@ -223,9 +211,6 @@ services:
     image: ghcr.io/hotio/lidarr
     container_name: lidarr
     restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
     networks:
       - servarr
     ports:
@@ -258,9 +243,6 @@ services:
     image: ghcr.io/hotio/bazarr
     container_name: bazarr
     restart: no
-    depends_on:
-      servarr:
-        condition: service_healthy
     networks:
       - servarr
     ports:

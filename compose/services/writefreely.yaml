@@ -1,0 +1,37 @@
+services:
+  alpine:
+    image: ghcr.io/writefreely/writefreely
+    container_name: writefreely
+    hostname: writefreely
+    restart: no
+    networks:
+      - homelab
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=$TIMEZONE
+    volumes:
+      - type: bind
+        source: config
+        target: /go/config.ini
+        read_only: false
+
+volumes:
+  config:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/writefreely/go/config.ini
+  database:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/writefreely/go/writefreely.db
+  keys:
+    driver: local
+    driver_opts:
+      type: bind
+      o: bind
+      device: $VOLUMES_PATH/writefreely/go/keys

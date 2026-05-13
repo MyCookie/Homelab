@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>sh.astral.uvx</string>
+
+    <!-- NEW KEY ADDED HERE -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- This ensures the system knows where Homebrew executables are -->
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/bin:/usr/bin</string>
+        <!-- Add other variables if needed -->
+    </dict>
+    <!-- END NEW KEY -->
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/uvx</string>
+        <string>mcp-proxy</string>
+        <string>--named-server-config</string>
+        <string>/Users/${whoami}/.config/uvx/mcp-proxy/config.json</string>
+        <string>--allow-origin</string>
+        <string>*</string>
+        <string>--port</string>
+        <string>8001</string>
+        <string>--stateless</string>
+    </array>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/sh.astral.uvx.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/sh.astral.uvx.err</string>
+</dict>
+</plist>

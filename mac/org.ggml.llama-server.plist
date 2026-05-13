@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.ggml.llama-server</string>  <!-- Unique identifier for the service -->
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/llama-server</string>  <!-- Path to your executable or script -->
+        <string>--webui-mcp-proxy</string>
+    </array>
+
+    <key>KeepAlive</key>
+    <true/>  <!-- If true, launchd will restart the service if it crashes -->
+
+    <key>RunAtLoad</key>
+    <true/>  <!-- If true, launchd will start the service when the system or user logs in -->
+
+    <key>StandardOutPath</key>
+    <string>/tmp/org.ggml.llama-server.log</string>  <!-- Redirect standard output to this file -->
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/org.ggml.llama-server.err</string>  <!-- Redirect standard error to this file -->
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>LLAMA_ARG_CTX_SIZE</key>
+        <string>128000</string> <!-- 8192, 16384, 32768, 65536, 128000, 131072 -->
+        <key>LLAMA_ARG_BATCH</key>
+        <string>2048</string>
+        <key>LLAMA_ARG_UBATCH</key>
+        <string>2048</string>
+        <key>LLAMA_ARG_ROPE_SCALING_TYPE</key>
+        <string>yarn</string>
+        <key>LLAMA_ARG_ROPE_FREQ_SCALE</key>
+        <string>0.75</string>
+        <key>LLAMA_ARG_CACHE_TYPE_K</key>
+        <string>q8_0</string>
+        <key>LLAMA_ARG_CACHE_TYPE_V</key>
+        <string>q8_0</string>
+        <key>LLAMA_ARG_N_GPU_LAYERS</key>
+        <string>all</string>
+        <key>LLAMA_ARG_KV_UNIFIED</key>
+        <string>true</string>
+        <key>LLAMA_ARG_POOLING</key>
+        <string>mean</string>
+        <key>LLAMA_ARG_IMAGE_MIN_TOKENS</key>
+        <string>1120</string>
+        <key>LLAMA_ARG_IMAGE_MAX_TOKENS</key>
+        <string>1120</string>
+        <key>LLAMA_ARG_HOST</key>
+        <string>0.0.0.0</string>
+        <key>LLAMA_ARG_PORT</key>
+        <string>8080</string>
+        <key>LLAMA_ARG_EMBEDDINGS</key>
+        <string></string>
+        <key>LLAMA_ARG_ENDPOINT_METRICS</key>
+        <string></string>
+        <key>LLAMA_ARG_MODELS_DIR</key>
+        <string>/Users/${whoami}/.cache/huggingface</string>
+        <key>LLAMA_ARG_THINK_BUDGET</key>
+        <string>2048</string>
+        <key>LLAMA_ARG_THINK_BUDGET_MESSAGE</key>
+        <string>... thinking budget exceeded, need to answer.\n</string>
+        <key>HF_TOKEN</key>
+        <string>${HF_TOKEN}</string>
+    </dict>
+</dict>
+</plist>

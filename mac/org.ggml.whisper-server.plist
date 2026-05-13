@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.ggml.whisper-server</string>  <!-- Unique identifier for the service -->
+
+    <!-- use flag --vad to enable voice activity detection -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/whisper-server</string>  <!-- Path to your executable or script -->
+        <string>--host</string>
+        <string>0.0.0.0</string>
+        <string>--port</string>
+        <string>9000</string>
+        <string>--model</string>
+        <string>/Users/${whoami}/.cache/huggingface/hub/models--ggerganov--whisper.cpp/snapshots/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-large-v3-turbo.bin</string>
+        <string>--language</string>
+        <string>auto</string>
+        <string>--translate</string>
+    </array>
+
+    <key>KeepAlive</key>
+    <true/>  <!-- If true, launchd will restart the service if it crashes -->
+
+    <key>RunAtLoad</key>
+    <true/>  <!-- If true, launchd will start the service when the system or user logs in -->
+
+    <key>StandardOutPath</key>
+    <string>/tmp/org.ggml.whisper-server.log</string>  <!-- Redirect standard output to this file -->
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/org.ggml.whisper-server.err</string>  <!-- Redirect standard error to this file -->
+
+    <key>EnvironmentVariables</key>
+    <dict>
+    </dict>
+</dict>
+</plist>

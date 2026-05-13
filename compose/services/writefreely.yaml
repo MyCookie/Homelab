@@ -11,27 +11,6 @@ services:
     environment:
       - TZ=$TIMEZONE
     volumes:
-      - type: bind
-        source: config
-        target: /go/config.ini
-        read_only: false
-
-volumes:
-  config:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: $VOLUMES_PATH/writefreely/go/config.ini
-  database:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: $VOLUMES_PATH/writefreely/go/writefreely.db
-  keys:
-    driver: local
-    driver_opts:
-      type: bind
-      o: bind
-      device: $VOLUMES_PATH/writefreely/go/keys
+      - ${VOLUMES_PATH}/writefreely/go/config.ini:/go/config.ini
+      - ${VOLUMES_PATH}/writefreely/go/writefreely.db:/go/database.ini
+      - ${VOLUMES_PATH}/writefreely/go/keys:/go/keys

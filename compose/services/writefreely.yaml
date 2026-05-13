@@ -1,5 +1,5 @@
 services:
-  alpine:
+  writefreely:
     image: ghcr.io/writefreely/writefreely
     container_name: writefreely
     hostname: writefreely

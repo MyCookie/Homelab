@@ -17,7 +17,6 @@ include:
   - services/audiobookshelf.yaml
   - services/forgejo.yaml
   - services/synapse.yaml
-  - services/writefreely.yaml
 
 services:
   watchtower:

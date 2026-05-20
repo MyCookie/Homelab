@@ -1,6 +1,6 @@
 services:
   llamacpp:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda12
     container_name: llamacpp
     restart: no
     ipc: host

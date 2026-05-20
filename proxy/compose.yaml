@@ -1,5 +1,8 @@
 name: proxy
 
+include:
+  - cookies.yaml
+
 services:
   watchtower:
     image: ghcr.io/nicholas-fedor/watchtower

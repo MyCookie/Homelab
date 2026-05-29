@@ -22,11 +22,13 @@ services:
       start_period: 15s
     environment:
       - LLAMA_ARG_CTX_SIZE=131072 # lowest common denominator
-      - LLAMA_ARG_BATCH=2042
-      - LLAMA_ARG_UBATCH=2042
+      - LLAMA_ARG_BATCH=2048
+      - LLAMA_ARG_UBATCH=2048
       - LLAMA_ARG_HOST=0.0.0.0
       - LLAMA_ARG_PORT=8000
       - LLAMA_ARG_WEBUI=0
       - LLAMA_ARG_MODELS_DIR=/root/.cache/huggingface
+      - LLAMA_ARG_THINK_BUDGET=1024
+      - LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
     volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface:ro
+      - ~/.cache/huggingface:/root/.cache/huggingface

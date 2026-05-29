@@ -1,0 +1,41 @@
+services:
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    image: vllm/vllm-openai:v0.21.0-cu129
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      # Disable FlashInfer entirely
+      - FLASHINFER_FORCE_DISABLE=1
+      # Safer backend for Gemma 4 on Spark
+      - VLLM_ATTENTION_BACKEND=TRITON_ATTN
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command:
+      - Intel/gemma-4-31B-it-int4-AutoRound
+      - --max-model-len
+      - "32768"
+      - --gpu-memory-utilization
+      - "0.90"
+      # MTP speculative decoding
+      - --speculative-config
+      - '{"method":"mtp","model":"google/gemma-4-31b-it-assistant","num_speculative_tokens":2}'
+      # Gemma 4 parsers
+      - --tool-call-parser
+      - gemma4
+      - --reasoning-parser
+      - gemma4
+      # Batch tuning
+      - --max-num-batched-tokens
+      - "4096"
+      - --enable-auto-tool-choice

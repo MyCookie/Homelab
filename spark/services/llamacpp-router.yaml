@@ -11,6 +11,9 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    configs:
+      - source: models.ini
+        target: /root/models.ini
     networks:
       - spark
     hostname: llamacpp
@@ -23,14 +26,62 @@ services:
       retries: 3
       start_period: 15s
     environment:
-      - LLAMA_ARG_CTX_SIZE=131072 # lowest common denominator
-      - LLAMA_ARG_BATCH=2048
-      - LLAMA_ARG_UBATCH=2048
       - LLAMA_ARG_HOST=0.0.0.0
       - LLAMA_ARG_PORT=8000
       - LLAMA_ARG_WEBUI=0
       - LLAMA_ARG_MODELS_DIR=/root/.cache/huggingface
-      - LLAMA_ARG_THINK_BUDGET=1024
-      - LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
+      - LLAMA_ARG_MODELS_PRESET=/root/models.ini
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
+
+configs:
+  models.ini:
+    content: |
+      version = 1
+
+      LLAMA_ARG_BATCH=2048
+      LLAMA_ARG_UBATCH=2048
+
+      LLAMA_ARG_CACHE_TYPE_K=q8_0
+      LLAMA_ARG_CACHE_TYPE_V=q8_0
+
+      [Qwen/Qwen3-Coder-Next-GGUF:Q8_0]
+      LLAMA_ARG_HF_REPO=Qwen/Qwen3-Coder-Next-GGUF:Q8_0
+      LLAMA_ARG_CTX_SIZE=65536
+
+      [ggml-org/gpt-oss-120b-GGUF:MXFP4]
+      LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
+      LLAMA_ARG_CTX_SIZE=128000
+
+      [ggml-org/Qwen3.6-35B-A3B-MTP-GGUF:Q8_0]
+      LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-35B-A3B-MTP-GGUF:Q8_0
+      LLAMA_ARG_CTX_SIZE=65536
+      LLAMA_ARG_SPEC_TYPE=draft-mtp
+      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
+      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
+      LLAMA_ARG_THINK_BUDGET=1024
+      LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
+
+      [unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0]
+      LLAMA_ARG_HF_REPO=unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0
+      LLAMA_ARG_CTX_SIZE=65536
+      LLAMA_ARG_SPEC_TYPE=draft-mtp
+      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
+      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
+      LLAMA_ARG_THINK_BUDGET=1024
+      LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
+
+      [unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL]
+      LLAMA_ARG_HF_REPO=unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL
+      LLAMA_ARG_CTX_SIZE=32768
+      ; https://github.com/ggml-org/llama.cpp/pull/23398#issuecomment-4646335387
+      ; spec-draft-n-max > 1 not implemented?
+      LLAMA_ARG_SPEC_DRAFT_N_MAX=1
+      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
+      LLAMA_ARG_SPEC_DRAFT_HF_REPO=google/gemma-4-31B-it-qat-q4_0-unquantized-assistant
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0

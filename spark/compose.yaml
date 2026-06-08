@@ -1,7 +1,6 @@
 name: spark
 
 include:
-  - services/openwebui.yaml
   - services/llamacpp-router.yaml
 
 services:

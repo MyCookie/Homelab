@@ -78,8 +78,10 @@ configs:
       [unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL]
       LLAMA_ARG_HF_REPO=unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL
       LLAMA_ARG_CTX_SIZE=32768
+      LLAMA_ARG_SPEC_TYPE=draft-mtp
       LLAMA_ARG_SPEC_DRAFT_N_MAX=3
       LLAMA_ARG_SPEC_DRAFT_N_MIN=0
-      LLAMA_ARG_SPEC_DRAFT_HF_REPO=Simplepotat/gemma-4-31b-it-qat-q4_0-assistant-gguf
+      ; mtp drafter does not have to be explicitly declared
+      : https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/blob/main/MTP/README.md
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0

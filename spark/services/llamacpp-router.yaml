@@ -78,9 +78,7 @@ configs:
       [unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL]
       LLAMA_ARG_HF_REPO=unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL
       LLAMA_ARG_CTX_SIZE=32768
-      ; https://github.com/ggml-org/llama.cpp/pull/23398#issuecomment-4646335387
-      ; spec-draft-n-max > 1 not implemented?
-      LLAMA_ARG_SPEC_DRAFT_N_MAX=1
+      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
       LLAMA_ARG_SPEC_DRAFT_N_MIN=0
       LLAMA_ARG_SPEC_DRAFT_HF_REPO=Simplepotat/gemma-4-31b-it-qat-q4_0-assistant-gguf
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0

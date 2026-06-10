@@ -82,6 +82,6 @@ configs:
       LLAMA_ARG_SPEC_DRAFT_N_MAX=3
       LLAMA_ARG_SPEC_DRAFT_N_MIN=0
       ; mtp drafter does not have to be explicitly declared
-      : https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/blob/main/MTP/README.md
+      ; https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/blob/main/MTP/README.md
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0

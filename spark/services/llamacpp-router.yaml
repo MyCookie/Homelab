@@ -45,10 +45,6 @@ configs:
       LLAMA_ARG_CACHE_TYPE_K=q8_0
       LLAMA_ARG_CACHE_TYPE_V=q8_0
 
-      [Qwen/Qwen3-Coder-Next-GGUF:Q8_0]
-      LLAMA_ARG_HF_REPO=Qwen/Qwen3-Coder-Next-GGUF:Q8_0
-      LLAMA_ARG_CTX_SIZE=65536
-
       [ggml-org/gpt-oss-120b-GGUF:MXFP4]
       LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
       LLAMA_ARG_CTX_SIZE=128000

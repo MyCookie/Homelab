@@ -63,9 +63,9 @@ configs:
       LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
       LLAMA_ARG_CTX_SIZE=128000
 
-      [unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0]
+      [ggml-org/Qwen3.6-27B-GGUF]
       LLAMA_ARG_ALIAS=qwen3.6-27b
-      LLAMA_ARG_HF_REPO=unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0
+      LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-27B-GGUF
       # drop to 65536 if OOM
       LLAMA_ARG_CTX_SIZE=98304
       LLAMA_ARG_SPEC_TYPE=draft-mtp

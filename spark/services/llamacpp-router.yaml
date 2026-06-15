@@ -29,6 +29,7 @@ services:
       - LLAMA_ARG_HOST=0.0.0.0
       - LLAMA_ARG_PORT=8000
       - LLAMA_ARG_WEBUI=0
+      - LLAMA_ARG_ENDPOINT_METRICS=1
       - LLAMA_ARG_MODELS_DIR=/root/.cache/huggingface
       - LLAMA_ARG_MODELS_PRESET=/root/models.ini
     volumes:

@@ -66,8 +66,7 @@ configs:
       [ggml-org/Qwen3.6-27B-GGUF:Q8_0]
       LLAMA_ARG_ALIAS=qwen3.6-27b
       LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-27B-GGUF:Q8_0
-      # drop to 65536 if OOM
-      LLAMA_ARG_CTX_SIZE=98304
+      LLAMA_ARG_CTX_SIZE=262144
       LLAMA_ARG_SPEC_TYPE=draft-mtp
       LLAMA_ARG_SPEC_DRAFT_N_MAX=3
       LLAMA_ARG_SPEC_DRAFT_N_MIN=0

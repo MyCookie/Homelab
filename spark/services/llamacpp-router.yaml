@@ -46,6 +46,11 @@ configs:
       LLAMA_ARG_CACHE_TYPE_K=q8_0
       LLAMA_ARG_CACHE_TYPE_V=q8_0
 
+      [ggml-org/gpt-oss-120b-GGUF:MXFP4]
+      LLAMA_ARG_ALIAS=gpt-oss-120b
+      LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
+      LLAMA_ARG_CTX_SIZE=128000
+
       [unsloth/gemma-4-12B-it-qat-GGUF:Q4_K_XL]
       LLAMA_ARG_ALIAS=gemma-4-12b-it
       LLAMA_ARG_HF_REPO=unsloth/gemma-4-12B-it-qat-GGUF:Q4_K_XL
@@ -59,11 +64,18 @@ configs:
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
       LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
 
-      [ggml-org/gpt-oss-120b-GGUF:MXFP4]
-      LLAMA_ARG_ALIAS=gpt-oss-120b
-      LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
-      LLAMA_ARG_CTX_SIZE=128000
-
+      [ggml-org/Qwen3.6-35B-A3B-GGUF:Q8_0]
+      LLAMA_ARG_ALIAS=qwen3.6-35b-a3b
+      LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-35B-A3B-GGUF:Q8_0
+      LLAMA_ARG_CTX_SIZE=262144
+      LLAMA_ARG_SPEC_TYPE=draft-mtp
+      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
+      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
+      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
+      LLAMA_ARG_THINK_BUDGET=1024
+      LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
+      
       [ggml-org/Qwen3.6-27B-GGUF:Q8_0]
       LLAMA_ARG_ALIAS=qwen3.6-27b
       LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-27B-GGUF:Q8_0

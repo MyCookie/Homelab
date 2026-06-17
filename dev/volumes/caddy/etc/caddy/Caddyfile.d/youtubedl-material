@@ -1,5 +1,0 @@
-# services/youtubedl-material.yaml
-
-nextcloud.TAILNET_NAME.ts.net:17442 {
-    reverse_proxy youtubedl:17442
-}

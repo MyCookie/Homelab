@@ -1,7 +1,0 @@
-# services/synapse.yaml
-# .well-kown directives are in the root Caddyfile
-
-nextcloud.TAILNET_NAME.ts.net:8008 {
-    # inside the tailnet it's safe to proxy all paths
-    reverse_proxy http://synapse:8008
-}

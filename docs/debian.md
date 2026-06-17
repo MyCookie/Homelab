@@ -1,3 +1,7 @@
+**DEPRECATED**
+
+This documentation is deprecated, but is left for archival purposes.
+
 # Debian
 
 This project assumes you're running Debian Stable. Most of this guide was written for Debian Bookworm, specifically [12.11](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.11.0-amd64-netinst.iso).

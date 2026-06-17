@@ -16,18 +16,14 @@ zpool create -f -m /pool/homelab -O encryption=on -O keyformat=passphrase -O key
     - `Archive`: Things that need to be saved, but do not fit into any of the descriptions below.
     - `Downloads`: Anything downloaded by a download manager running inside the Homelab.
     - `Library`: The top-level dataset of any data that is managed by services running inside the Homelab.
-        - `Audiobooks`: Audiobooks managed by Readarr.
-            - Currently, Audiobooks managed by Audiobookshelf are not here, as there are some edge cases where their expected Library tree conflict.
-        - `Books`: Books managed by Readarr.
+        - `Audiobooks`: Audiobooks managed by Audiobookshelf.
         - `Games`
             - `GOG`: GOG installer files managed by `lgogdownloader`.
                 - Currently, `lgogdownloader` is running on a client system.
                 - TODO: Build a Docker container to automatically download and update GOG installer files.
             - `Steam`: The archived Steam Library.
-        - `Moves`: Movies managed by Radarr.
-        - `Music`: Music managed by Lidarr.
+        - `Music`
         - `Podcasts`: Podcasts managed by Audiobookshelf.
-        - `TV`: Shows managed by Sonarr.
     - `Services`
         - `Docker`
             - `Projects`: Compose/Swarm Stacks, Helm Charts, etc.

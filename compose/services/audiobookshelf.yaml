@@ -1,0 +1,30 @@
+services:
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    restart: no
+    user: $UID:$GID
+    networks:
+      - homelab
+    hostname: audiobookshelf
+    ports:
+      - "13378:80"
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/audiobookshelf/audiobooks
+        target: /audiobooks
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/audiobookshelf/podcasts
+        target: /podcasts
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/audiobookshelf/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/audiobookshelf/metadata
+        target: /metadata
+        read_only: false
+    environment:
+      - TZ=$TIMEZONE

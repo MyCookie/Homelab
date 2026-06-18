@@ -1,0 +1,45 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: unless-stopped
+    # Uncomment for Intel
+    # group_add:
+    #   - $RENDER_GROUP_ID
+    # devices:
+    #   - /dev/dri/renderD128:/dev/dri/renderD128
+    # environment:
+    #   - OLLAMA_INTEL_GPU=true
+    # Uncomment for Nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1 # alternatively, use `count: all` for all GPUs
+    #           capabilities: [gpu]
+    networks:
+      - nextcloud
+      - homelab
+    ports:
+      - 11434:11434
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/ollama/root/.ollama
+        target: /root/.ollama
+        read_only: false
+
+  whisper.cpp:
+    image: ghcr.io/ggml-org/whisper.cpp:main
+    container_name: whispercpp
+    restart: unless-stopped
+    networks:
+      - nextcloud
+      - homelab
+    ports:
+      - 9000:9000
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/whisper.cpp/models
+        target: /models
+        read_only: false

@@ -1,0 +1,33 @@
+services:
+  nextcloud:
+    image: nextcloud:32
+    container_name: nextcloud # only available when deploying using docker-compose
+    network_mode: service:tailscale
+    restart: no
+    depends_on:
+      - minio
+      - mariadb
+      - valkey
+      - tailscale
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/nextcloud/var/www/html
+        target: /var/www/html
+        read_only: false
+
+  nextcloud-cron:
+    image: nextcloud:32
+    container_name: nextcloud-cron
+    networks:
+      - nextcloud
+    restart: no
+    depends_on:
+      - minio
+      - mariadb
+      - valkey
+    entrypoint: /cron.sh
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/nextcloud/var/www/html
+        target: /var/www/html
+        read_only: false

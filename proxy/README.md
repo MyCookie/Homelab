@@ -53,6 +53,49 @@ matrix.$DOMAIN_URL {
 
 See https://caddyserver.com/docs/caddyfile/directives/reverse_proxy#https for more details.
 
+### Jellyfin example
+
+```
+stream.$DOMAIN_URL {
+        tls /etc/ssl/$DOMAIN_URL/$DOMAIN_URL.cert.pem /etc/ssl/$DOMAIN_URL/$DOMAIN_URL.key.pem
+
+        @admin_path {
+                path /admin/*
+                path /System/Info
+                path /swagger
+                path /Onboarding
+                path /Sync
+        }
+        respond @admin_path "Access Denied" 403
+
+        log {
+                output file /var/log/caddy/$DOMAIN_URL/stream/caddy.log
+        }
+
+        # From Gemini(!): Additional security headers
+        header {
+                # Disable FLoC tracking
+                Permissions-Policy "interest-cohort=()"
+                # Enable HSTS (Strict Transport Security)
+                Strict-Transport-Security "max-age=31536000;"
+                # Prevent browsers from sniffing MIME types
+                X-Content-Type-Options "nosniff"
+                # Clickjacking protection
+                X-Frame-Options "DENY"
+                X-XSS-Protection "1; mode=block"
+        }
+
+        reverse_proxy http://jellyfin.$TAILNET.ts.net:8096 {
+                # From Gemini(!)
+                # Crucial for Jellyfin to see the real client IP for logs/security
+                header_up Host {host}
+                header_up X-Real-IP {remote_host}
+                header_up X-Forwarded-For {remote_host}
+                header_up X-Forwarded-Proto {scheme}
+        }
+}
+```
+
 ### Logging
 
 Add the `log` directive to each proxied site. The location is arbitrary, as long as Caddy can write to it.

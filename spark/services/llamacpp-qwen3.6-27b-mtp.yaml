@@ -1,0 +1,33 @@
+services:
+  llamacpp:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    container_name: llamacpp
+    restart: no
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    hostname: llamacpp
+    ports:
+      - 8000:8000
+    environment:
+      - LLAMA_ARG_CTX_SIZE=65536
+      - LLAMA_ARG_BATCH=2048
+      - LLAMA_ARG_UBATCH=2048
+      - LLAMA_ARG_HF_REPO=unsloth/Qwen3.6-27B-MTP-GGUF:Q8_0
+      - LLAMA_ARG_HOST=0.0.0.0
+      - LLAMA_ARG_PORT=8000
+      - LLAMA_ARG_WEBUI=0
+      - LLAMA_ARG_THINK_BUDGET=4096
+      - LLAMA_ARG_THINK_BUDGET_MESSAGE='... thinking budget exceeded, need to answer.\n'
+      - LLAMA_ARG_SPEC_TYPE='draft-mtp'
+      - LLAMA_ARG_SPEC_DRAFT_N_MAX=3
+      - LLAMA_ARG_SPEC_DRAFT_N_MIN=0
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface:ro

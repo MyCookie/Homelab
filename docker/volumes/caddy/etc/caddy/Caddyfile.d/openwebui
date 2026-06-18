@@ -1,4 +1,0 @@
-# services/openwebui.yaml
-nextcloud.TAILNET_NAME.ts.net:8080 {
-	reverse_proxy openwebui:8080
-}

@@ -1,0 +1,18 @@
+services:
+  synapse:
+    image: matrixdotorg/synapse
+    container_name: synapse
+    hostname: synapse
+    restart: always
+    user: $UID:$GID
+    ports:
+      - 8008:8008
+    networks:
+      - homelab
+    depends_on:
+      - postgres
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/synapse/data
+        target: /data
+        read_only: false

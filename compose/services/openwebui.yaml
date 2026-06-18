@@ -1,0 +1,14 @@
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: no
+    networks:
+      - nextcloud
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/open-webui/app/backend/data
+        target: /app/backend/data
+        read_only: false

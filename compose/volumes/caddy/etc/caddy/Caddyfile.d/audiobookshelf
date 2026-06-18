@@ -1,0 +1,4 @@
+# services/audiobookshelf.yaml
+homelab.TAILNET_NAME.ts.net:13378 {
+	reverse_proxy audiobookshelf:13378
+}

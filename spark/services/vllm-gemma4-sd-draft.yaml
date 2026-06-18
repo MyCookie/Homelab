@@ -1,0 +1,24 @@
+services:
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    image: vllm/vllm-openai # v0.20.0 or higher
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface:ro
+    command: >
+      nvidia/Gemma-4-31B-IT-NVFP4
+      --max-model-len 256000
+      --gpu-memory-utilization 0.8
+      --speculative-config '{"model": "nvidia/Gemma-4-26B-A4B-NVFP4", "num_speculative_tokens": 5, "method": "draft_model"}'

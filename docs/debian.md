@@ -1,0 +1,324 @@
+**DEPRECATED**
+
+This documentation is deprecated, but is left for archival purposes.
+
+# Debian
+
+This project assumes you're running Debian Stable. Most of this guide was written for Debian Bookworm, specifically [12.11](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.11.0-amd64-netinst.iso).
+
+Perform a standard install, without a desktop environment, with a SSH server.
+
+>NOTE: `apt` will install packages for a GUI by default. When running headless, add `--no-install-recommends` to avoid installing any desktop envrionment packages, or `xorg`.
+
+## ZFS
+
+Enable the `contrib` repository. Install from backports:
+
+```console
+apt install -t stable-backports zfsutils-linux linux-headers-amd64
+```
+> **NOTE** Do not use the `--no-install-recommends` flag when installing this package, as it will *not* install `zfs-dkms`.
+
+### ARC size
+
+Get the size of the memory pool in bytes with `free --bytes`.
+
+Set the ARC size for each boot with:
+
+```console
+echo "options zfs zfs_arc_max=$SOME_BYTES" >> /etc/modprobe.d/zfs.conf
+```
+
+Set the ARC size for the current boot with:
+
+```console
+echo "$SOME_BYTES" > /sys/module/zfs/parameters/zfs_arc_max
+```
+
+`/usr/sbin/arc_summary` presents the ARC stats in a human-readable manner.
+
+See: https://serverfault.com/questions/581669/why-isnt-the-arc-max-setting-honoured-on-zfs-on-linux.
+
+### Snapshots
+
+Two options:
+
+1. [`zrepl`](https://zrepl.github.io/installation/apt-repos.html). A simple `/etc/zrepl/zrepl.yml`:
+
+```yaml
+jobs:
+# this job takes care of snapshot creation + pruning
+- name: snapjob
+  type: snap
+  filesystems: {
+      "system<": true,
+  }
+  # create snapshots with prefix `zrepl_` every 15 minutes
+  snapshotting:
+    type: periodic
+    interval: 15m
+    prefix: zrepl_
+  pruning:
+    keep:
+    # fade-out scheme for snapshots starting with `zrepl_`
+    # - keep all created in the last hour
+    # - then destroy snapshots such that we keep 24 each 1 hour apart
+    # - then destroy snapshots such that we keep 14 each 1 day apart
+    # - then destroy all older snapshots
+    - type: grid
+      grid: 1x1h(keep=all) | 24x1h | 14x1d
+      regex: "^zrepl_.*"
+    # keep all snapshots that don't have the `zrepl_` prefix
+    - type: regex
+      negate: true
+      regex: "^zrepl_.*"
+```
+
+2. `zfs-auto-snapshot`. Clone the [git repository](https://github.com/zfsonlinux/zfs-auto-snapshot). Perform the `make install` and enable the scripts you need in `/etc/cron.*`.
+
+### NFS
+
+```console
+apt install nfs-kernel-server
+```
+
+### Deleting datasets
+
+>**WARNING**: *EXTREMELY DANGEROUS*. This is permenent. Only do this if you completely understand what you're doing.
+
+```console
+zfs list -t snapshot -o name | grep $SNAPSHOT_PREFIX | xargs -n1 zfs destroy
+```
+
+## Cockpit
+
+```console
+apt install --no-install-recommends cockpit cockpit-packagekit cockpit-pcp
+```
+
+## Nvidia
+
+Enable the `contrib`, `non-free` and `non-free-firmware` repositories. For a headless install:
+
+```console
+apt install --no-install-recommends nvidia-driver firmware-misc-nonfree nvidia-smi
+```
+
+## Docker
+
+[Install Docker](https://docs.docker.com/engine/install/debian/):
+
+```bash
+# Add Docker's official GPG key:
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+```
+
+```console
+# apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Optionally, add your user to the group `docker` for ease-of-use.
+
+`docker.io` from the Debian repository will technically work, but does not have the current compose plugin. You will need to refactor the compose YAML files and possibly the `.env` files as well.
+
+### Watchtower
+
+```console
+docker run --interactive --tty --detach --name watchtower --restart always --env WATCHTOWER_CLEANUP --env WATCHTOWER_CLEANUP_VOLUMES --volume /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower
+```
+
+### Nvidia
+
+[Install the container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+
+### Podman
+
+Podman may also work, but will require siginificant re-tooling into whatever the current accepted orchestration system is. You will also have to change some compose directives; for example exposing the Nvidia GPU is easier in Podman:
+
+```yaml
+services:
+  app:
+    [...]
+    devices:
+      - nvidia.com/gpu=all
+    [...]
+```
+
+The catch is you may need to run `nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml` on every boot.
+
+## Virtual Machines
+
+Install libvirt and the cockpit VM webui:
+
+```console
+apt install --no-install-recommends qemu-system libvirt-daemon-system libvirt-clients qmeu-utils ovmf virtinst cockpit-machines
+```
+
+We are not supposed to run an instance of `dnsmasq` outside the control of `libvirt`. If you do, networking will fail to create the interfaces it needs. If you see the something similar to:
+
+```console
+Could not start virtual network 'default': internal error
+Child process (/usr/sbin/dnsmasq --strict-order --bind-interfaces
+--pid-file=/var/run/libvirt/network/default.pid --conf-file=
+--except-interface lo --listen-address 192.168.122.1
+--dhcp-range 192.168.122.2,192.168.122.254
+--dhcp-leasefile=/var/lib/libvirt/dnsmasq/default.leases
+--dhcp-lease-max=253 --dhcp-no-override) status unexpected: exit status 2
+```
+
+Then there is another instance of `dnsmasq` (or another DHCP daemon that calls it) running on the system.
+
+Disable `dnsmasq`:
+
+```console
+systemctl disable --now dnsmasq.service
+```
+
+[See here for more info.](https://wiki.libvirt.org/Virtual_network_default_has_not_been_started.html)
+
+## TrueNAS
+
+Installing Debian on the TrueNAS webui will need some tweaks to work.
+
+- Set the VNC resolution to 800x600.
+- After installing, go back into recovery mode in the ISO, and install GRUB on the "removable" ESP.
+
+## Tailscale
+
+Install Tailscale:
+
+```console
+curl -fsSL https://tailscale.com/install.sh | sh
+```
+
+## Migration
+
+### From TrueNAS SCALE
+
+#### Alternate root
+TrueNAS uses the `zpool` property `altroot` to specify a mountpoint below `/`. For example:
+
+```console
+$ zpool get altroot Homelab
+NAME     PROPERTY  VALUE    SOURCE
+Homelab  altroot   /mnt     local
+```
+
+`zfs` will inherit the alternate root, and will appropriately prepend the value when mounting. Continuing the example:
+
+```console
+$ zfs get mountpoint Homelab
+NAME     PROPERTY    VALUE         SOURCE
+Homelab  mountpoint  /mnt/Homelab  local
+```
+
+However, when setting a new mountpoint for the pool, you will have to remember that `zfs` will prepend the altroot. For example, if we want to change the mountpoint for `Homelab` to `/pool/Homelab`, this will not work:
+
+```console
+# zfs set mountpoint=/pool/Homelab Homelab
+```
+
+Instead, you can either change the `zpool altroot` property, or erase it and manage the mountpoint with `zfs`:
+
+```console
+# zpool set altroot=/pool Homelab
+```
+
+#### Removing the Nvidia drivers
+
+TrueNAS SCALE is an immutable operating system, similar to `rpm-ostree`, or the modern macOS. This means kernel extentions and modules outside the base system are "layered-on" top of the base image. Installing a kernel module may not survive reboots or upgrades.
+
+When installing the Nvidia drivers on SCALE, there a lot of beind-the-scenes black magic that happens to make everything seamless. In order to remove the drivers after changing the hardware, there is significant manual work involved.
+
+Before starting, make sure to:
+1. Remove all containers. Images built when the Nvidia container toolkit was installed will no longer work, and will need to be rebuilt.
+2. Remove all declerations to the Nvidia driver from your compose directives, helm charts or podman units.
+3. Stop all "Apps" and other services using the docker daemon.
+4. Stop the docker daemon itself. (`# systemctl disable --now docker.service`)
+5. We will require the tools iX uses to work on SCALE, install them with `# install-dev-tools`.
+
+Once that is done:
+1. Remove the layer `# systemd-sysext unmerge`.
+2. Get the label for the layer `# systemd-sysext list`, you will need the `PATH` value.
+3. Remove the image `# rm $PATH`.
+4. Disable the Nvidia driver in Docker `# midclt call --job docker.update '{"nvidia": false}'`.
+  - Verify the change with `# midclt call docker.config`.
+5. Enable the docker daemon without starting it `# systemctl enable docker.service`.
+6. Reboot the machine.
+
+Thanks to [juchong](https://forums.truenas.com/u/juchong/summary) on the TrueNAS forums for this [solution](https://forums.truenas.com/t/error-response-from-daemon-unknown-or-invalid-runtime-name-nvidia/50285)!
+
+The old `deploy.sh` script for archival documentation:
+```bash
+#!/bin/bash
+
+# load our variables
+# https://gist.github.com/mihow/9c7f559807069a03e302605691f85572
+if [ ! -f prod/services/env/nextcloud.env ]; then
+    export $(cat prod/services/env/nextcloud.env | xargs)
+fi
+
+CADDYFILE_PATH="$VOLUMES_PATH/caddy/etc/caddy"
+CADDYFILE="$CADDYFILE_PATH/Caddyfile"
+
+# check permissions for VOLUMES_PATH
+FAIL_STATE=0
+if [ -d $VOLUMES_PATH ]  && [ ! -w $VOLUMES_PATH ]; then
+    echo "$VOLUMES_PATH exists, but cannot write into it."
+    FAIL_STATE=1
+elif [ ! -d $VOLUMES_PATH ] && [ ! -w $VOLUMES_PATH/.. ]; then
+    echo "Don't have the permissions to create $VOLUMES_PATH."
+    FAIL_STATE=1
+else
+    mkdir -p $VOLUMES_PATH
+    # if [ $? -ne 0 ]; then
+    #     echo "Could not create volumes directory at $VOLUMES_PATH."
+    #   return
+    # fi
+fi
+
+# check for docker-compose-plugin
+if [ ! dpkg-query -W -f='${Status}' docker-compose-plugin | grep -q -E 'install ok installed' ]; then
+    echo "Compose pulgin not installed!"
+    FAIL_STATE=1
+fi
+
+if [ FAIL_STATE -eq 1 ]; then
+    return
+fi
+
+# build the caddyfile
+if [ ! -f $VOLUMES_PATH/caddy/etc/caddy/Caddyfile ]; then
+    mkdir -p $CADDYFILE_PATH
+
+    cp -r prod/volumes/caddy/etc/caddy/* $CADDYFILE_PATH/
+
+    # replace the vars in the caddyfile with the vars in env
+    sed -i -e "s/TAILNET_NAME/$TAILNET/g" $CADDYFILE
+    sed -i -e "s/DOMAIN_NAME/$DOMAIN_URL/g" $CADDYFILE
+else
+    echo "Existing Caddyfile found, skipping build."
+fi
+
+if id -nG ${whoami} | grep -qw "docker"; then
+    docker compose up -d
+else
+    sudo docker compose up -d
+fi
+```
+

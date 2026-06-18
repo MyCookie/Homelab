@@ -1,0 +1,4 @@
+# services/nextcloud.yaml
+homelab.TAILNET_NAME.ts.net:3000 {
+	reverse_proxy forgejo:3000
+}

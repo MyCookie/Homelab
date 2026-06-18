@@ -1,0 +1,33 @@
+name: nextcloud
+
+include:
+  # configs
+  - configs.yaml
+  # networks
+  - networks/homelab.yaml
+  - networks/nextcloud.yaml
+  # dependencies
+  - services/database.yaml
+  - services/minio.yaml
+  # nextcloud
+  - services/jellyfin.yaml
+  - services/nextcloud.yaml
+  - services/tailscale.yaml
+  # services
+  - services/audiobookshelf.yaml
+  - services/forgejo.yaml
+  - services/synapse.yaml
+
+services:
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower
+    container_name: watchtower
+    hostname: watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_CLEANUP_VOLUMES=true
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock

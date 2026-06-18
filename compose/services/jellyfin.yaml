@@ -1,0 +1,40 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    restart: no
+    user: $UID:$GID
+    networks:
+      - nextcloud
+    ports:
+      - 8096:8096
+    # Uncomment for QuickSync transcode
+    # group_add:
+    #   - $RENDER_GROUP_ID
+    # devices:
+    #   - /dev/dri/renderD128:/dev/dri/renderD128
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/jellyfin/cache
+        target: /cache
+        read_only: false
+      - type: bind
+        source: $VOLUMES_PATH/jellyfin/config
+        target: /config
+        read_only: false
+      - type: bind
+        source: $MEDIA_PATH/Movies
+        target: /library/movies
+        read_only: true
+      - type: bind
+        source: $MEDIA_PATH/TV
+        target: /library/tv
+        read_only: true
+      - type: bind
+        source: $MEDIA_PATH/Music
+        target: /library/music
+        read_only: true
+      - type: bind
+        source: $MEDIA_PATH/Soundtracks
+        target: /library/soundtracks
+        read_only: true

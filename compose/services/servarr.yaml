@@ -1,0 +1,329 @@
+name: servarr
+
+# Create an .env file with the following values:
+# PUID=1000
+# PGID=1000
+# UMASK=002
+# TZ=America/Toronto
+# FORWARDED_PORT=
+
+services:
+  # This follows hotios guides for setting up 'arrs in docker
+  # https://hotio.dev/
+
+  # This also follows the owner and permissions guidelines from the servarr wiki
+  # https://wiki.servarr.com/docker-guide#multiple-users-and-a-shared-group
+  # On the host, create the group servarr:
+  # groupadd --gid $ARR_GID servarr
+  # For each 'arr, create it's user that belongs to the servarr group:
+  # useradd --no-user-group -M --groups servarr --uid ${RAD/SON/...}ARR_UID ${RAD/SON/...}ARR_USER
+
+  # The base image is the exit node for services in the stack, and the node through
+  # which we access the various webuis
+  # https://hotio.dev/guides/torguard/
+  # https://hotio.dev/containers/base/
+  #
+  # When it's working, the logs should show something similar to this:
+  # [INF] [2024-03-12 07:29:51] [VPN] Performing internet connectivity test...
+  # [INF] [2024-03-12 07:29:51] [VPN] [IPV4] [PING: 25.167 ms] [Amsterdam, NH, The Netherlands] [UK-2 Limited] [206.217.216.28]
+  servarr:
+    image: ghcr.io/hotio/base:alpinevpn
+    container_name: servarr
+    hostname: servarr
+    restart: no
+    networks:
+      - servarr
+    # Ports will be routed through this container
+    ports:
+      - "8088:8088" # qbittorrent
+    env_file:
+      - ./servarr.env
+    environment:
+      - VPN_ENABLED=true
+      - VPN_CONF=wg0
+      - VPN_PROVIDER=generic
+      - VPN_LAN_NETWORK=192.168.0.0/16,100.64.0.0/10
+      - VPN_LAN_LEAK_ENABLED=false
+      # Add ports to the list below to open them over LAN
+      - VPN_EXPOSE_PORTS_ON_LAN=8088/tcp
+      - VPN_AUTO_PORT_FORWARD=false
+      - VPN_AUTO_PORT_FORWARD_TO_PORTS=
+      - VPN_FIREWALL_TYPE=auto
+      - VPN_HEALTHCHECK_ENABLED=false
+      - VPN_NAMESERVERS=
+      - PRIVOXY_ENABLED=false
+      - UNBOUND_ENABLED=false
+      - UNBOUND_NAMESERVERS
+    healthcheck:
+      # Technically, it's better to piggyback on what hotio uses during startup:
+      # https://github.com/hotio/root-files/blob/6/root/etc/s6-overlay/s6-rc.d/init-setup/run
+      # https://github.com/hotio/root-files/blob/6/root/etc/s6-overlay/s6-rc.d/init-wireguard/run.up
+      test: ["CMD", "curl", "-sS", "https://ifconfig.io/ip"] # Check if network is up
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 30s # Time to wait before starting health checks
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1 #
+      - net.ipv6.conf.all.disable_ipv6=1 #
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/servarr/config
+        target: /config
+        read_only: false
+
+  qbittorrent:
+    image: ghcr.io/hotio/qbittorrent
+    container_name: qbittorrent
+    restart: no
+    depends_on:
+      servarr:
+        condition: service_healthy
+    network_mode: "service:servarr"
+    env_file:
+      - ./servarr.env
+    environment:
+      - WEBUI_PORTS=8088/tcp,8088/udp # change from default 8080
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "qbittorrent-nox-lib1"] # Check if process is running
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/qbittorrent/config
+        target: /config
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+      - type: bind
+        source: $DOWNLOAD_PATH/Torrents
+        target: /downloads
+
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd
+    container_name: sabnzbd
+    restart: no
+    networks:
+      - servarr
+    ports:
+      - 8888:8888
+    env_file:
+      - ./servarr.env
+    environment:
+      - WEBUI_PORTS=8888/tcp,8888/udp # change from default 8080
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "SABnzbd.py"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/sabnzbd/config
+        target: /config
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
+        target: /nzb
+
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr
+    container_name: prowlarr
+    restart: no
+    networks:
+      - servarr
+    ports:
+      - 9696:9696
+    env_file:
+      - ./servarr.env
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Prowlarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/prowlarr/config
+        target: /config
+
+  radarr:
+    image: ghcr.io/hotio/radarr
+    container_name: radarr
+    restart: no
+    networks:
+      - servarr
+    ports:
+      - 7878:7878
+    env_file:
+      - ./servarr.env
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Radarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/radarr/config
+        target: /config
+      - type: bind
+        source: $LIBRARY_PATH/Movies
+        target: /library/movies
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: true
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
+        target: /nzb
+        read_only: false
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr
+    container_name: sonarr
+    restart: no
+    networks:
+      - servarr
+    ports:
+      - 8989:8989
+    env_file:
+      - ./servarr.env
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Sonarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/sonarr/config
+        target: /config
+      - type: bind
+        source: $LIBRARY_PATH/TV
+        target: /library/tv
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: true
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
+        target: /nzb
+        read_only: false
+
+  lidarr:
+    image: ghcr.io/hotio/lidarr
+    container_name: lidarr
+    restart: no
+    networks:
+      - servarr
+    ports:
+      - 8686:8686
+    env_file:
+      - ./servarr.env
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "Lidarr"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/lidarr/config
+        target: /config
+      - type: bind
+        source: $LIBRARY_PATH/Music
+        target: /library/music
+      - type: bind
+        source: $DOWNLOAD_PATH/Servarr/Torrents
+        target: /downloads/servarr
+        read_only: true
+      - type: bind
+        source: $DOWNLOAD_PATH/NZB
+        target: /nzb
+        read_only: false
+
+  bazarr:
+    image: ghcr.io/hotio/bazarr
+    container_name: bazarr
+    restart: no
+    networks:
+      - servarr
+    ports:
+      - 6767:6767
+    env_file:
+      - ./servarr.env
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "python3"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/bazarr/config
+        target: /config
+      - type: bind
+        source: $LIBRARY_PATH/Movies
+        target: /library/movies
+      - type: bind
+        source: $LIBRARY_PATH/TV
+        target: /library/tv
+
+  # jellyfin:
+  #   image: ghcr.io/hotio/jellyfin
+  #   container_name: jellyfin
+  #   restart: no
+  #   depends_on:
+  #     servarr:
+  #       condition: service_healthy
+  #   networks:
+      - servarr
+  #   env_file:
+  #     - ./servarr.env
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "localhost:8096/health"]
+  #     interval: 1m
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 30s
+  #   volumes:
+  #     - type: volume
+  #       source: jellyfin_config
+  #       target: /config
+  #       read_only: false
+  #     - type: volume
+  #       source: library
+  #       target: /library
+  #       read_only: true
+  #     - type: volume
+  #       source: downloads
+  #       target: /downloads
+  #       read_only: true
+
+networks:
+  servarr:
+    name: servarr
+
+# volumes:
+#   downloads:
+#     driver: local
+#     driver_opts:
+#       type: nfs
+#       o: addr=$STORAGE_IPV4,rw,nfsvers=3
+#       device: ":${DOWNLOAD_PATH}"
+#   library:
+#     driver: local
+#     driver_opts:
+#       type: nfs
+#       o: addr=$STORAGE_IPV4,rw,nfsvers=3
+#       device: ":${LIBRARY_PATH}"
+#   jellyfin_config:
+#     driver: local
+#     driver_opts:
+#       type: nfs
+#       o: addr=$STORAGE_IPV4,rw,nfsvers=3
+#       device: ":${VOLUMES_PATH_REMOTE}/jellyfin/config"

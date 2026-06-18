@@ -1,0 +1,23 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: no
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    hostname: ollama
+    networks:
+      - spark
+    environment:
+      - OLLAMA_FLASH_ATTENTION=1
+      - OLLAMA_KV_CACHE_TYPE="q8_0"
+    ports:
+      - "11434:11434"
+    volumes:
+      - ~/.ollama:/root/.ollama

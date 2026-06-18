@@ -1,0 +1,27 @@
+services:
+  vllm:
+    container_name: vllm
+    hostname: vllm
+    image: vllm/vllm-openai
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - spark
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - TIKTOKEN_ENCODINGS_BASE=/root/.cache/openai-harmony/encodings
+    volumes:
+      - ${HOME}/.cache/huggingface:/root/.cache/huggingface:ro
+      - ${HOME}/.cache/openai-harmony/encodings:/root/.cache/openai-harmony/encodings:ro
+    # by default, the image entrypoint is 'vllm serve'
+    command: >
+      openai/gpt-oss-120b
+      --gpu-memory-utilization 0.85
+      --max-model-len 131072
+      --kv-cache-dtype "fp8"

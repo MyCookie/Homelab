@@ -1,0 +1,22 @@
+services:
+  tailscale:
+    image: tailscale/tailscale
+    container_name: tailscale
+    restart: no
+    hostname: tailscale
+    cap_add:
+      - net_admin
+      - sys_module
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      - nextcloud
+    env_file: ../env/tailscale.env
+    configs:
+      - source: tailscale_serve
+        target: /etc/tailscale/serve/nextcloud.conf
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/tailscale/var/lib/tailscale
+        target: /var/lib/tailscale
+        read_only: false

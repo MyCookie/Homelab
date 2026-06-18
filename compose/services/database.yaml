@@ -1,0 +1,46 @@
+services:
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: no
+    user: $UID:$GID
+    networks:
+      - nextcloud
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb # only available when deploying using docker-compose
+    networks:
+      - nextcloud
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-read-only-compressed=OFF
+    restart: always
+    environment:
+      - MARIADB_AUTO_UPGRADE=0 # disabled by default
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/mariadb/var/lib/mysql
+        target: /var/lib/mysql
+        read_only: false
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    networks:
+      - homelab
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/postgres/data
+        target: /var/lib/postgresql/data
+        read_only: false
+    environment:
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+
+  valkey:
+    image: valkey/valkey
+    container_name: valkey
+    hostname: valkey
+    networks:
+      - nextcloud
+    restart: always

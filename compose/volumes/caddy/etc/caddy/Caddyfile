@@ -1,0 +1,15 @@
+# https://caddyserver.com/docs/caddyfile/directives/import
+import ./Caddyfile.d/*
+
+# Disable HTTPS
+# Changing Host headers sometimes causes odd edge-cases in nextcloud, forgejo, etc
+# Wireguard tunnels are encrypted anyways
+auto_https off
+
+homelab.TAILNET_NAME.ts.net {
+    # for nextcloud
+    redir /.well-known/carddav /remote.php/dav 301
+    redir /.well-known/caldav /remote.php/dav 301
+
+    reverse_proxy nextcloud
+}

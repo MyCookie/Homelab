@@ -1,0 +1,27 @@
+services:
+  minio:
+    image: quay.io/minio/minio
+    restart: no
+    user: $UID:$GID
+    container_name: minio
+    command: 'server /data --console-address ":9001"'
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nextcloud
+      - homelab
+    volumes:
+      - type: volume
+        source: minio
+        target: /data
+
+volumes:
+  minio:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${VOLUMES_PATH_REMOTE}/minio/data"

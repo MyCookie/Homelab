@@ -1,0 +1,23 @@
+# To initialize:
+# docker run --rm --interactive --tty
+#   --volume $VOLUMES_PATH/writefreely/go/config.ini:/go/config.ini
+#   --volume $VOLUMES_PATH/writefreely/go/writefreely.db:/go/writefreely.db
+#   --volume $VOLUMES_PATH/writefreely/go/keys:/go/keys
+#   ghcr.io/writefreely/writefreely ${config/keys}
+services:
+  writefreely:
+    image: ghcr.io/writefreely/writefreely
+    container_name: writefreely
+    hostname: writefreely
+    restart: no
+    networks:
+      - homelab
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=$TIMEZONE
+    # container runs as daemon user with id 2
+    volumes:
+      - ${VOLUMES_PATH}/writefreely/go/config.ini:/go/config.ini
+      - ${VOLUMES_PATH}/writefreely/go/writefreely.db:/go/writefreely.db
+      - ${VOLUMES_PATH}/writefreely/go/keys:/go/keys

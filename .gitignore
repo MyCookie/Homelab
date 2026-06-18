@@ -50,3 +50,24 @@ Temporary Items
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux
+
+### Editors/Tooling ###
+.idea/
+*.swp
+*.swo
+
+### Claude Code ###
+.claude/
+
+### Docker Compose local overrides ###
+docker-compose.override.yml
+docker-compose.override.yaml
+compose.override.yml
+compose.override.yaml
+
+### Secrets/TLS material (certs are managed on-host, never in-repo) ###
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx

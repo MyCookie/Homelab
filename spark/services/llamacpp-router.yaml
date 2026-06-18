@@ -46,12 +46,6 @@ configs:
       LLAMA_ARG_CACHE_TYPE_K=q8_0
       LLAMA_ARG_CACHE_TYPE_V=q8_0
 
-      [ggml-org/gpt-oss-120b-GGUF:MXFP4]
-      LLAMA_ARG_ALIAS=gpt-oss-120b
-      LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF
-      LLAMA_ARG_CTX_SIZE=131072
-      LLAMA_ARG_JINJA=1
-
       [unsloth/gemma-4-12B-it-qat-GGUF:Q4_K_XL]
       LLAMA_ARG_ALIAS=gemma-4-12b-it
       LLAMA_ARG_HF_REPO=unsloth/gemma-4-12B-it-qat-GGUF:Q4_K_XL

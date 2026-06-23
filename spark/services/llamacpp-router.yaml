@@ -1,6 +1,6 @@
 services:
   llamacpp:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda12
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda13
     container_name: llamacpp
     restart: no
     ipc: host
@@ -11,9 +11,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    configs:
-      - source: models.ini
-        target: /root/models.ini
     networks:
       - spark
     hostname: llamacpp
@@ -34,63 +31,4 @@ services:
       - LLAMA_ARG_MODELS_PRESET=/root/models.ini
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
-
-configs:
-  models.ini:
-    content: |
-      version = 1
-
-      LLAMA_ARG_BATCH=2048
-      LLAMA_ARG_UBATCH=2048
-
-      LLAMA_ARG_CACHE_TYPE_K=q8_0
-      LLAMA_ARG_CACHE_TYPE_V=q8_0
-
-      [unsloth/gemma-4-12B-it-qat-GGUF:Q4_K_XL]
-      LLAMA_ARG_ALIAS=gemma-4-12b-it
-      LLAMA_ARG_HF_REPO=unsloth/gemma-4-12B-it-qat-GGUF:Q4_K_XL
-      # 262144 may be too large w/ mtp
-      LLAMA_ARG_CTX_SIZE=131072
-      LLAMA_ARG_SPEC_TYPE=draft-mtp
-      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
-      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
-      ; mtp drafter does not have to be explicitly declared
-      ; https://huggingface.co/unsloth/gemma-4-12B-it-GGUF/blob/main/MTP/README.md
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
-
-      [ggml-org/Qwen3.6-35B-A3B-GGUF:Q8_0]
-      LLAMA_ARG_ALIAS=qwen3.6-35b-a3b
-      LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-35B-A3B-GGUF:Q8_0
-      LLAMA_ARG_CTX_SIZE=262144
-      LLAMA_ARG_SPEC_TYPE=draft-mtp
-      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
-      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
-      LLAMA_ARG_THINK_BUDGET=1024
-      LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
-      
-      [ggml-org/Qwen3.6-27B-GGUF:Q8_0]
-      LLAMA_ARG_ALIAS=qwen3.6-27b
-      LLAMA_ARG_HF_REPO=ggml-org/Qwen3.6-27B-GGUF:Q8_0
-      LLAMA_ARG_CTX_SIZE=262144
-      LLAMA_ARG_SPEC_TYPE=draft-mtp
-      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
-      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
-      LLAMA_ARG_THINK_BUDGET=1024
-      LLAMA_ARG_THINK_BUDGET_MESSAGE='Thinking budget exceeded.\n'
-
-      [unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL]
-      LLAMA_ARG_ALIAS=gemma-4-31b-it
-      LLAMA_ARG_HF_REPO=unsloth/gemma-4-31B-it-qat-GGUF:Q4_K_XL
-      LLAMA_ARG_CTX_SIZE=32768
-      LLAMA_ARG_SPEC_TYPE=draft-mtp
-      LLAMA_ARG_SPEC_DRAFT_N_MAX=3
-      LLAMA_ARG_SPEC_DRAFT_N_MIN=0
-      ; mtp drafter does not have to be explicitly declared
-      ; https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/blob/main/MTP/README.md
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_K=q8_0
-      LLAMA_ARG_SPEC_DRAFT_CACHE_TYPE_V=q8_0
+      - ~/.cache/llama.cpp/models.ini:/root/models.ini:ro

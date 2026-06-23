@@ -31,4 +31,4 @@ services:
       - LLAMA_ARG_MODELS_PRESET=/root/models.ini
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
-      - ~/.cache/llamacpp/models.ini:/root/models.ini:ro
+      - ~/.cache/llama.cpp/models.ini:/root/models.ini:ro

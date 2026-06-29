@@ -134,10 +134,13 @@ restarts it, which used to only happen on the next login/reboot.
 
 ## Logging
 
-Every run writes a date-stamped log file to `mac/upgrade/logs/` (ignored
-by git) capturing the full detail of that run — every log line at every
-level, plus the real stdout/stderr of every command — regardless of
-`--verbose`. `--verbose` only changes what's *additionally* echoed to the
+Every run writes a log file to `mac/upgrade/logs/` (ignored by git) named
+`update-YYYYmmdd-HHMMSS-PID.log`, capturing the full detail of that run —
+every log line at every level, plus the real stdout/stderr of every
+command — regardless of `--verbose`. The trailing PID exists because the
+timestamp alone only has one-second resolution: two runs started in the
+same second would otherwise collide and the second would truncate the
+first's log. `--verbose` only changes what's *additionally* echoed to the
 console: by default the console shows phase/service banners plus
 INFO/WARN/ERROR lines; `--verbose` adds the literal commands being run
 and their live output. Color is used when attached to a terminal and

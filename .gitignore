@@ -71,3 +71,6 @@ compose.override.yaml
 *.crt
 *.p12
 *.pfx
+
+### mac/upgrade run logs ###
+mac/upgrade/logs/

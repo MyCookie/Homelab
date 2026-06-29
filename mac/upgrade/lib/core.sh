@@ -67,6 +67,15 @@ log_step() {
   printf '%s%s%s%s\n' "$C_BOLD" "$C_GREEN" "$msg" "$C_RESET"
 }
 
+# launchagent_loaded LABEL
+#
+# True if a LaunchAgent with the given label is currently loaded. Used by
+# LaunchAgent-backed services to skip their unload/load hooks when the
+# agent isn't running, without skipping the underlying package upgrade.
+launchagent_loaded() {
+  launchctl list "$1" >/dev/null 2>&1
+}
+
 # run CMD [ARGS...]
 #
 # Single chokepoint for dry-run / verbosity / logging. Service modules

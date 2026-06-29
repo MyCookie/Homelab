@@ -7,7 +7,7 @@ CORE_SH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 UPGRADE_DIR="$(cd "$CORE_SH_DIR/.." && pwd)"
 LOG_DIR="$UPGRADE_DIR/logs"
 mkdir -p "$LOG_DIR"
-LOG_FILE="$LOG_DIR/update-$(date +%Y%m%d-%H%M%S).log"
+LOG_FILE="$LOG_DIR/update-$(date +%Y%m%d-%H%M%S)-$$.log"
 : >"$LOG_FILE"
 
 DRY_RUN="${DRY_RUN:-0}"

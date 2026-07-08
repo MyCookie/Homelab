@@ -4,6 +4,7 @@
 #   --volume $VOLUMES_PATH/writefreely/go/writefreely.db:/go/writefreely.db
 #   --volume $VOLUMES_PATH/writefreely/go/keys:/go/keys
 #   ghcr.io/writefreely/writefreely ${config/keys}
+# container runs as daemon user with id 2
 services:
   writefreely:
     image: ghcr.io/writefreely/writefreely

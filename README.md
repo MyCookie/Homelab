@@ -2,7 +2,7 @@
 
 Config for a self-hosted homelab: Docker Compose stacks for Nextcloud, Jellyfin, Synapse, Forgejo, and other services, a Caddy reverse-proxy setup, and operational docs for running it all on Debian + ZFS.
 
-Evolved from [docker_cloud](https://github.com/MyCookie/docker_cloud) (2019–2021), which ran the same idea as a single-file Docker Compose stack + nginx before this repo moved to a split, `include:`-based Compose layout, Caddy, ZFS, and a GPU LLM-inference layer. Longer writeup on the philosophy behind it: [pen.kansara.ca/ashish/the-stack](https://pen.kansara.ca/ashish/the-stack).
+Evolved from [docker_cloud](https://github.com/MyCookie/docker_cloud) (2019–2021), which ran the same idea on **Docker Swarm (per-service stacks) behind nginx** before this repo moved to a split, `include:`-based Compose layout, Caddy, ZFS, and a GPU LLM-inference layer.
 
 ## What this is
 

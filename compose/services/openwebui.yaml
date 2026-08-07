@@ -4,11 +4,26 @@ services:
     container_name: openwebui
     restart: no
     networks:
-      - nextcloud
+      - homelab
+      - openwebui
     ports:
       - "8080:8080"
     volumes:
       - type: bind
         source: $VOLUMES_PATH/open-webui/app/backend/data
         target: /app/backend/data
+        read_only: false
+  
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    container_name: open-terminal
+    restart: unless-stopped
+    networks:
+      - openwebui
+    environment:
+      - OPEN_TERMINAL_API_KEY=your-secret-key
+    volumes:
+      - type: bind
+        source: $VOLUMES_PATH/open-terminal/home/user
+        target: /home/user
         read_only: false

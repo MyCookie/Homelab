@@ -24,3 +24,14 @@ Fix: `models.ini` is now bind-mounted from a real, persistent file (`volumes/lla
 mkdir -p ~/.cache/llamacpp
 ln -s "$(pwd)/volumes/llamacpp/models.ini" ~/.cache/llamacpp/models.ini
 ```
+### `llama.cpp` fails to load GPT-OSS
+
+Explicitly enable Jinja:
+
+```
+[ggml-org/gpt-oss-120b-GGUF:MXFP4]
+LLAMA_ARG_ALIAS=gpt-oss,gpt-oss-120b
+LLAMA_ARG_HF_REPO=ggml-org/gpt-oss-120b-GGUF:MXFP4
+LLAMA_ARG_CTX_SIZE=131072
+LLAMA_ARG_JINJA=true
+```

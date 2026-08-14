@@ -1,0 +1,46 @@
+services:
+  vllm:
+    container_name: vllm
+    image: vllm/vllm-openai:v0.27.1-aarch64-ubuntu2404
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "8000:8000"
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    configs:
+      - source: vllm_runtime_config
+        target: /etc/vllm/config.yaml
+    command: --config /etc/vllm/config.yaml
+
+configs:
+  vllm_runtime_config:
+    # Dynamically inject the file path; fallback to default if unset
+    #file: ${VLLM_CONFIG_FILE:-./configs/qwen3.5-default.yaml}
+    content: |
+      model: "unsloth/Qwen3.5-122B-A10B-NVFP4"
+      trust_remote_code: true
+      gpu_memory_utilization: 0.8
+      enable_per_request_metrics: true
+      enable_return_routed_experts: true
+      #max_model_len: 262144
+      max_model_len: 131072
+      reasoning_parser: "qwen3"
+      default_chat_template_kwargs: '{"thinking":false}'
+      enable_auto_tool_choice: true
+      tool_call_parser: "qwen3_coder"
+      # for effectively serving concurrent requests
+      enable_prefix_caching: true
+
+      # JSON string converted to native YAML map
+      speculative_config:
+        method: "mtp"
+        num_speculative_tokens: 2

@@ -1,0 +1,42 @@
+services:
+  vllm:
+    container_name: vllm
+    image: vllm/vllm-openai:qwen38
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "8000:8000"
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    configs:
+      - source: vllm_runtime_config
+        target: /etc/vllm/config.yaml
+    command: --config /etc/vllm/config.yaml
+
+configs:
+  vllm_runtime_config:
+    content: |
+      model: "unsloth/Qwen3.8-27B-NVFP4"
+      trust_remote_code: true
+      gpu_memory_utilization: 0.8
+      enable_per_request_metrics: true
+      max_model_len: 262144
+      reasoning_parser: "qwen3"
+      default_chat_template_kwargs: '{"preserve_thinking": true}'
+      enable_auto_tool_choice: true
+      tool_call_parser: "qwen3_coder"
+      # for effectively serving concurrent requests
+      enable_prefix_caching: true
+
+      # JSON string converted to native YAML map
+      speculative_config:
+        method: "mtp"
+        num_speculative_tokens: 2

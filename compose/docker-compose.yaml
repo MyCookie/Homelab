@@ -6,6 +6,7 @@ include:
   # networks
   - networks/homelab.yaml
   - networks/nextcloud.yaml
+  - networks/openwebui.yaml
   # dependencies
   - services/database.yaml
   - services/minio.yaml
@@ -16,6 +17,7 @@ include:
   # services
   - services/audiobookshelf.yaml
   - services/forgejo.yaml
+  - services/openwebui.yaml
   - services/synapse.yaml
   - services/writefreely.yaml
 

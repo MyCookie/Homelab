@@ -14,6 +14,17 @@ services:
       - WATCHTOWER_CLEANUP_VOLUMES=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  dozzle:
+    image: amir20/dozzle
+    container_name: dozzle
+    hostname: dozzle
+    restart: unless-stopped
+    networks:
+      - spark
+    ports:
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   spark:

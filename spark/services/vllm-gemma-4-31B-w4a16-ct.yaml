@@ -1,0 +1,43 @@
+services:
+  gemma4:
+    container_name: gemma4
+    image: vllm/vllm-openai:vllm/vllm-openai:v0.27.1-aarch64
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "8001:8000"
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    configs:
+      - source: vllm_runtime_config
+        target: /etc/vllm/config.yaml
+    command: --config /etc/vllm/config.yaml
+
+configs:
+  vllm_runtime_config:
+    content: |
+      model: "google/gemma-4-31B-it-qat-w4a16-ct"
+      trust_remote_code: true
+      gpu_memory_utilization: 0.4
+      enable_per_request_metrics: true
+      kv_cache_dtype: fp8
+      max_model_len: 262144
+      async_scheduling: true
+      default_chat_template_kwargs: '{"preserve_thinking": true}'
+      enable_auto_tool_choice: true
+      tool_call_parser: gemma4
+      # for effectively serving concurrent requests
+      enable_prefix_caching: true
+      # JSON string converted to native YAML map
+      speculative_config:
+        method: "mtp"
+        model: "google/gemma-4-31B-it-qat-q4_0-unquantized-assistant"
+        num_speculative_tokens: 2

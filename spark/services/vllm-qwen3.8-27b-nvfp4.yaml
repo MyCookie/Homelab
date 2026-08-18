@@ -1,6 +1,6 @@
 services:
-  vllm:
-    container_name: vllm
+  qwen38:
+    container_name: qwen38
     image: vllm/vllm-openai:qwen38
     ipc: host
     deploy:

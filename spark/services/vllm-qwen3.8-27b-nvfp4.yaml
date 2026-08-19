@@ -22,7 +22,7 @@ services:
     command: --config /etc/vllm/config.yaml
 
 configs:
-  vllm_runtime_config_gemma_4_31b:
+  vllm_runtime_config_qwen38_27b:
     content: |
       model: "unsloth/Qwen3.8-27B-NVFP4"
       trust_remote_code: true

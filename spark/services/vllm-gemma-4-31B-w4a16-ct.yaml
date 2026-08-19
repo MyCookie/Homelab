@@ -1,7 +1,7 @@
 services:
   gemma4:
     container_name: gemma4
-    image: vllm/vllm-openai:vllm/vllm-openai:v0.27.1-aarch64
+    image: vllm/vllm-openai:v0.26.0-aarch64-ubuntu2404
     ipc: host
     deploy:
       resources:
@@ -11,7 +11,7 @@ services:
               count: all
               capabilities: [gpu]
     ports:
-      - "8001:8000"
+      - "8000:8000"
     environment:
       - HF_TOKEN=${HF_TOKEN}
     volumes:
@@ -26,7 +26,7 @@ configs:
     content: |
       model: "google/gemma-4-31B-it-qat-w4a16-ct"
       trust_remote_code: true
-      gpu_memory_utilization: 0.4
+      gpu_memory_utilization: 0.8
       enable_per_request_metrics: true
       kv_cache_dtype: fp8
       max_model_len: 262144

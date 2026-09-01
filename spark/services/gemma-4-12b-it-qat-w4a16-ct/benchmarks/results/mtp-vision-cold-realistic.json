@@ -1,0 +1,98 @@
+{
+  "generated_at": "2026-08-26T05:06:44Z",
+  "image": "benchmarks/assets/apollo-frame-10s.jpg",
+  "summary": [
+    {
+      "scenario": "image_realistic",
+      "first_ttft_seconds": 2.865248859860003,
+      "repeat_ttft_median_seconds": 0.18478270946070552,
+      "prompt_tokens": 5010
+    },
+    {
+      "scenario": "text_tiny",
+      "first_ttft_seconds": 0.11712377890944481,
+      "repeat_ttft_median_seconds": 0.11839735158719122,
+      "prompt_tokens": 21
+    },
+    {
+      "scenario": "image_tiny",
+      "first_ttft_seconds": 0.22411678615026176,
+      "repeat_ttft_median_seconds": 0.17162629251834005,
+      "prompt_tokens": 287
+    }
+  ],
+  "requests": [
+    {
+      "ttft_seconds": 2.865248859860003,
+      "total_seconds": 2.990186315961182,
+      "prompt_tokens": 5010,
+      "output_tokens": 8,
+      "scenario": "image_realistic",
+      "repetition": 0
+    },
+    {
+      "ttft_seconds": 0.17984175705350935,
+      "total_seconds": 0.29559859493747354,
+      "prompt_tokens": 5010,
+      "output_tokens": 8,
+      "scenario": "image_realistic",
+      "repetition": 1
+    },
+    {
+      "ttft_seconds": 0.18972366186790168,
+      "total_seconds": 0.3064827020280063,
+      "prompt_tokens": 5010,
+      "output_tokens": 8,
+      "scenario": "image_realistic",
+      "repetition": 2
+    },
+    {
+      "ttft_seconds": 0.11712377890944481,
+      "total_seconds": 0.22225843206979334,
+      "prompt_tokens": 21,
+      "output_tokens": 8,
+      "scenario": "text_tiny",
+      "repetition": 0
+    },
+    {
+      "ttft_seconds": 0.11740010208450258,
+      "total_seconds": 0.22294528712518513,
+      "prompt_tokens": 21,
+      "output_tokens": 8,
+      "scenario": "text_tiny",
+      "repetition": 1
+    },
+    {
+      "ttft_seconds": 0.11939460108987987,
+      "total_seconds": 0.2261780221015215,
+      "prompt_tokens": 21,
+      "output_tokens": 8,
+      "scenario": "text_tiny",
+      "repetition": 2
+    },
+    {
+      "ttft_seconds": 0.22411678615026176,
+      "total_seconds": 0.33238513418473303,
+      "prompt_tokens": 287,
+      "output_tokens": 8,
+      "scenario": "image_tiny",
+      "repetition": 0
+    },
+    {
+      "ttft_seconds": 0.1694688070565462,
+      "total_seconds": 0.2844990771263838,
+      "prompt_tokens": 287,
+      "output_tokens": 8,
+      "scenario": "image_tiny",
+      "repetition": 1
+    },
+    {
+      "ttft_seconds": 0.1737837779801339,
+      "total_seconds": 0.2830512879882008,
+      "prompt_tokens": 287,
+      "output_tokens": 8,
+      "scenario": "image_tiny",
+      "repetition": 2
+    }
+  ]
+}

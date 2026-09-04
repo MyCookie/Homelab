@@ -17,12 +17,12 @@ services:
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
     configs:
-      - source: vllm_runtime_config
+      - source: vllm_runtime_config_gemma4_31b
         target: /etc/vllm/config.yaml
     command: --config /etc/vllm/config.yaml
 
 configs:
-  vllm_runtime_config:
+  vllm_runtime_config_gemma4_31b:
     content: |
       model: "google/gemma-4-31B-it-qat-w4a16-ct"
       trust_remote_code: true

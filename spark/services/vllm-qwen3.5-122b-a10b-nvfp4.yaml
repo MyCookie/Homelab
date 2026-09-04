@@ -17,12 +17,12 @@ services:
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
     configs:
-      - source: vllm_runtime_config
+      - source: vllm_runtime_config_qwen3.5_122b
         target: /etc/vllm/config.yaml
     command: --config /etc/vllm/config.yaml
 
 configs:
-  vllm_runtime_config:
+  vllm_runtime_config_qwen3.5_122b:
     # Dynamically inject the file path; fallback to default if unset
     #file: ${VLLM_CONFIG_FILE:-./configs/qwen3.5-default.yaml}
     content: |

@@ -1,5 +1,5 @@
 services:
-  gemma4:
+  gemma4-12b:
     container_name: gemma4-12b
     build:
       context: .

@@ -26,7 +26,7 @@ configs:
     content: |
       model: "google/gemma-4-31B-it-qat-w4a16-ct"
       trust_remote_code: true
-      gpu_memory_utilization: 0.8
+      gpu_memory_utilization: 0.6
       enable_per_request_metrics: true
       kv_cache_dtype: fp8
       max_model_len: 262144

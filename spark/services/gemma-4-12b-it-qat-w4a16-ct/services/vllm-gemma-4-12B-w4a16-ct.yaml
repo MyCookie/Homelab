@@ -38,7 +38,9 @@ configs:
       max_num_seqs: 16
       async_scheduling: true
       default_chat_template_kwargs: '{"preserve_thinking": true}'
+      mm_processor_kwargs: '{"max_soft_tokens": 560}'
       enable_auto_tool_choice: true
+      reasoning_parser: gemma4
       tool_call_parser: gemma4
       # for effectively serving concurrent requests
       enable_prefix_caching: true

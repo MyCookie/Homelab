@@ -1,6 +1,6 @@
 services:
   gemma4:
-    container_name: gemma4
+    container_name: gemma4-12b
     build:
       context: .
       dockerfile: services/gemma-4-12b-it-qat-w4a16-ct/services/vllm-gemma-4-12B-w4a16-ct.Dockerfile

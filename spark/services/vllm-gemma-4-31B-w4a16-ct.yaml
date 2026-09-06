@@ -32,7 +32,8 @@ configs:
       max_model_len: 262144
       async_scheduling: true
       default_chat_template_kwargs: '{"preserve_thinking": true}'
-      mm_processor_kwargs: '{"max_soft_tokens": 1120}'
+      mm_processor_kwargs:
+        max_soft_tokens: 1120
       enable_auto_tool_choice: true
       tool_call_parser: gemma4
       reasoning_parser: gemma4

@@ -8,10 +8,9 @@ services:
     ports:
       - "8081:8080"
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/open-webui/app/backend/data
+      - type: volume
+        source: open-webui
         target: /app/backend/data
-        read_only: false
   
   open-terminal:
     image: ghcr.io/open-webui/open-terminal
@@ -22,7 +21,20 @@ services:
     environment:
       - OPEN_TERMINAL_API_KEY=your-secret-key
     volumes:
-      - type: bind
-        source: $VOLUMES_PATH/open-terminal/home/user
+      - type: volume
+        source: open-terminal
         target: /home/user
-        read_only: false
+
+volumes:
+  open-webui:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${VOLUMES_PATH_REMOTE}/open-webui/app/backend/data"
+  open-termianl:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      device: ":${VOLUMES_PATH_REMOTE}/open-terminal/home/user"

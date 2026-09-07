@@ -32,7 +32,7 @@ volumes:
       type: nfs
       o: addr=$STORAGE_IPV4,rw,nfsvers=3
       device: ":${VOLUMES_PATH_REMOTE}/open-webui/app/backend/data"
-  open-termianl:
+  open-terminal:
     driver: local
     driver_opts:
       type: nfs

@@ -30,11 +30,11 @@ volumes:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
       device: ":${VOLUMES_PATH_REMOTE}/open-webui/app/backend/data"
   open-terminal:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=$STORAGE_IPV4,rw,nfsvers=3
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
       device: ":${VOLUMES_PATH_REMOTE}/open-terminal/home/user"

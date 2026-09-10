@@ -31,8 +31,7 @@ configs:
       gpu_memory_utilization: 0.8
       enable_per_request_metrics: true
       enable_return_routed_experts: true
-      #max_model_len: 262144
-      max_model_len: 131072
+      max_model_len: 262144
       reasoning_parser: "qwen3"
       default_chat_template_kwargs: '{"thinking":false}'
       enable_auto_tool_choice: true

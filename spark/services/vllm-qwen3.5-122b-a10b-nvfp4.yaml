@@ -1,6 +1,6 @@
 services:
-  vllm:
-    container_name: vllm
+  qwen35:
+    container_name: qwen35
     image: vllm/vllm-openai:v0.27.1-aarch64-ubuntu2404
     ipc: host
     deploy:

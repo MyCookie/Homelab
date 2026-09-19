@@ -24,9 +24,9 @@ services:
 configs:
   vllm_runtime_config_qwen38_27b:
     content: |
-      model: "unsloth/Qwen3.8-27B-NVFP4"
+      model: "nvidia/Qwen3.8-27B-NVFP4"
       trust_remote_code: true
-      gpu_memory_utilization: 0.6
+      gpu_memory_utilization: 0.8
       enable_per_request_metrics: true
       kv_cache_dtype: fp8
       max_model_len: 262144

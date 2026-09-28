@@ -27,7 +27,3 @@ services:
       - homelab
     depends_on:
       - prometheus
-
-networks:
-  homelab:
-    external: true

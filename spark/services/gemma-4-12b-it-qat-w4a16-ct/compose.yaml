@@ -1,0 +1,5 @@
+include:
+  - services/vllm-gemma-4-12B-w4a16-ct.yaml
+
+networks:
+  spark:

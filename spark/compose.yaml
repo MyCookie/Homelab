@@ -2,6 +2,7 @@ name: spark
 
 include:
   - services/llamacpp-router.yaml
+  - services/openwebui.yaml
 
 services:
   watchtower:

@@ -1,0 +1,93 @@
+# Multimodal test assets
+
+These assets were selected for deterministic local smoke tests. Each asset's
+Wikimedia Commons description page explicitly marks it as public domain in the
+United States. NASA's media-use policy is included as additional evidence for
+the Apollo recordings.
+
+## `cat_operating_camera.jpg`
+
+- Expected content: a black-and-white historical photograph of two cats posed
+  around an early motion-picture camera; one cat sits on a chair behind the
+  camera and another is beside it.
+- Format and dimensions: progressive grayscale JPEG, 1536 x 859 pixels.
+- Size: 149,222 bytes.
+- Direct source: <https://upload.wikimedia.org/wikipedia/commons/c/cd/Cat_operating_camera.jpg>
+- Description and license evidence: <https://commons.wikimedia.org/wiki/File:Cat_operating_camera.jpg>
+- Provenance: Library of Congress photograph dated 1898; the Commons page
+  identifies it as public domain in the United States.
+- SHA-256: `75a636414cf252d5c8a0c463192ed1534ccbdcfa5896fe27ac2bdf58486fa0ab`
+
+## `armstrong_small_step.ogg`
+
+- Expected content: Neil Armstrong speaking as he steps off the Apollo Lunar
+  Module onto the Moon.
+- Expected transcript: "And, uh, step off the LM now. That's one small step for
+  [a] man, one giant leap for mankind."
+- Format: Ogg Vorbis, mono, 11,025 Hz.
+- Duration: 24.113 seconds.
+- Size: 98,702 bytes.
+- Direct source: <https://upload.wikimedia.org/wikipedia/commons/d/dd/Armstrong_Small_Step.ogg>
+- Description and license evidence: <https://commons.wikimedia.org/wiki/File:Armstrong_Small_Step.ogg>
+- Additional NASA policy evidence: <https://www.nasa.gov/nasa-brand-center/images-and-media/>
+- Provenance: NASA Apollo 11 recording dated July 21, 1969; the Commons page
+  identifies it as a public-domain work created solely by NASA.
+- SHA-256: `ad48575dea687c5109bcaf1675ee39008bd6f0a3a5f3457daab986d16c9d56ba`
+
+## `armstrong_small_step_16khz.wav`
+
+- Purpose: compatibility fixture derived locally from
+  `armstrong_small_step.ogg`; content, transcript, provenance, and public-domain
+  status are identical to that source asset.
+- Transformation: decoded and resampled with FFmpeg using `-ac 1 -ar 16000
+  -c:a pcm_s16le`; no content edits were made.
+- Format: RIFF/WAVE, signed 16-bit little-endian PCM, mono, 16,000 Hz.
+- Duration: 24.112688 seconds.
+- Size: 771,684 bytes.
+- SHA-256: `cf808a5010f1cd942df9332d34c1ba1dde6a0a893358189d7515313b18900ac8`
+
+## `what_is_your_favorite_book.ogg`
+
+- Expected content and exact transcript: "What is your favorite book?"
+- Format: Ogg Vorbis, mono, 44,100 Hz.
+- Duration: 1.950 seconds.
+- Size: 22,475 bytes.
+- Direct source: <https://upload.wikimedia.org/wikipedia/commons/2/2d/En-us-What_is_your_favorite_book.ogg>
+- Description and license evidence: <https://commons.wikimedia.org/wiki/File:En-us-What_is_your_favorite_book.ogg>
+- Provenance: clean American-English pronunciation recorded by Wikimedia user
+  DroEsperanto with Shtooka Recorder. The creator states "Own work, all rights
+  released (Public domain)," and the Commons metadata marks it public domain,
+  attribution not required, and not copyrighted.
+- SHA-256: `fc8fd8e8032d3f92bed344fa08d234b941771f6c97d265ecbd1e5ea4d47b5d82`
+
+## `one_small_step_nasa.webm`
+
+- Expected content: grainy black-and-white Apollo 11 footage showing Neil
+  Armstrong descending the Lunar Module ladder and taking the first human step
+  on the Moon. The clip includes mission audio and the "one small step" line.
+- Format and dimensions: WebM, VP9 video with Opus audio, 1280 x 720 pixels.
+- Duration: 56.121 seconds.
+- Size: 2,990,645 bytes.
+- Direct source: <https://upload.wikimedia.org/wikipedia/commons/3/3e/One_Small_Step_-_NASA.webm>
+- Description and license evidence: <https://commons.wikimedia.org/wiki/File:One_Small_Step_-_NASA.webm>
+- Additional NASA policy evidence: <https://www.nasa.gov/nasa-brand-center/images-and-media/>
+- Provenance: restored Apollo 11 footage from NASA Johnson; the Commons page
+  identifies it as a public-domain work created solely by NASA.
+- SHA-256: `b5c5aed12227844dfa623a969333a71308c41e195d631e544cd240e58517bd05`
+
+## Derived benchmark asset outside this directory
+
+`benchmarks/assets/apollo-frame-10s.jpg` is a JPEG frame extracted locally at
+00:00:10 from `one_small_step_nasa.webm` with FFmpeg (`-frames:v 1 -q:v 3`).
+Its content, provenance, and public-domain status are inherited from that NASA
+source. SHA-256:
+`0ce0e8c2482725e878c3f6d7e27984402769de58dd2f3c2f7adc56e6b8bbed34`.
+
+## Local verification
+
+The host `file` utility recognized the downloaded containers. Because host
+`ffprobe` is unavailable, FFprobe from the local vLLM container image verified
+the audio and video stream metadata and durations. Wikimedia Commons metadata
+provided an independent match. Checksums were computed locally after download
+or conversion.
+

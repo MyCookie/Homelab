@@ -1,0 +1,52 @@
+services:
+  gemma4-12b:
+    container_name: gemma4-12b
+    build:
+      context: .
+      dockerfile: services/gemma-4-12b-it-qat-w4a16-ct/services/vllm-gemma-4-12B-w4a16-ct.Dockerfile
+    #    image: vllm/vllm-openai:gemma4-unified
+    image: local/vllm-openai:v0.26.0-gemma4-pr48515
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ports:
+      - "8001:8000"
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    configs:
+      - source: vllm_runtime_config_gemma4_12b
+        target: /etc/vllm/config.yaml
+    command: --config /etc/vllm/config.yaml
+
+configs:
+  vllm_runtime_config_gemma4_12b:
+    content: |
+      model: "google/gemma-4-12B-it-qat-w4a16-ct"
+      trust_remote_code: true
+      gpu_memory_utilization: 0.25
+      #enable_per_request_metrics: true
+      kv_cache_dtype: fp8
+      max_model_len: 262144
+      max_num_batched_tokens: 2496
+      max_num_seqs: 16
+      async_scheduling: true
+      default_chat_template_kwargs: '{"preserve_thinking": true}'
+      mm_processor_kwargs:
+        max_soft_tokens: 1120
+      enable_auto_tool_choice: true
+      reasoning_parser: gemma4
+      tool_call_parser: gemma4
+      # for effectively serving concurrent requests
+      enable_prefix_caching: true
+      speculative_config:
+        method: "mtp"
+        model: "google/gemma-4-12B-it-qat-q4_0-unquantized-assistant"
+        num_speculative_tokens: 4
+      # JSON string converted to native YAML map

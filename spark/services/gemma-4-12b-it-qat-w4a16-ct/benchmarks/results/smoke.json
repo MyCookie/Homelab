@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-08-25T19:46:05Z",
+  "arguments": {
+    "base_url": "http://127.0.0.1:8001",
+    "model": "google/gemma-4-12B-it-qat-w4a16-ct",
+    "tokens": [
+      500
+    ],
+    "concurrency": [
+      1
+    ],
+    "cache_modes": [
+      "cold"
+    ],
+    "repetitions": 1,
+    "max_tokens": 2,
+    "timeout": 600.0,
+    "output": "benchmarks/results/smoke.json"
+  },
+  "summary": [
+    {
+      "target_tokens": 500,
+      "cache_mode": "cold",
+      "concurrency": 1,
+      "requests": 1,
+      "ttft_p50_seconds": 0.3263715950306505,
+      "ttft_p95_seconds": 0.3263715950306505,
+      "latency_p50_seconds": 0.32657596399076283,
+      "latency_p95_seconds": 0.32657596399076283,
+      "mean_prompt_tokens_per_second": 1574.891956978452,
+      "mean_output_tokens_per_second": 9786.221933608123
+    }
+  ],
+  "requests": [
+    {
+      "target_tokens": 500,
+      "concurrency": 1,
+      "cache_mode": "cold",
+      "request_index": 0,
+      "prompt_tokens": 514,
+      "output_tokens": 2,
+      "ttft_seconds": 0.3263715950306505,
+      "total_seconds": 0.32657596399076283,
+      "prompt_tokens_per_second": 1574.891956978452,
+      "output_tokens_per_second": 9786.221933608123,
+      "error": null
+    }
+  ]
+}

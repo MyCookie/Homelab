@@ -5,24 +5,36 @@ services:
     restart: no
     networks:
       - spark
-    hostname: openwebui
     ports:
-      - "127.0.0.1:8080:8080"
+      - "8081:8080"
     volumes:
-      - open-webui:/app/backend/data
-
+      - type: volume
+        source: open-webui
+        target: /app/backend/data
+  
   open-terminal:
     image: ghcr.io/open-webui/open-terminal
     container_name: open-terminal
-    restart: no
+    restart: unless-stopped
     networks:
       - spark
-    hostname: open-terminal
     environment:
       - OPEN_TERMINAL_API_KEY=your-secret-key
     volumes:
-      - open-terminal:/home/user
+      - type: volume
+        source: open-terminal
+        target: /home/user
 
 volumes:
   open-webui:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH_REMOTE}/open-webui/app/backend/data"
   open-terminal:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=$STORAGE_IPV4,rw,nfsvers=4
+      device: ":${VOLUMES_PATH_REMOTE}/open-terminal/home/user"

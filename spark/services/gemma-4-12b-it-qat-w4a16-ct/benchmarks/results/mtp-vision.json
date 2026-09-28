@@ -1,0 +1,98 @@
+{
+  "generated_at": "2026-08-26T04:46:29Z",
+  "image": "tests/assets/cat_operating_camera.jpg",
+  "summary": [
+    {
+      "scenario": "text_tiny",
+      "first_ttft_seconds": 0.10963424388319254,
+      "repeat_ttft_median_seconds": 0.11571674689184874,
+      "prompt_tokens": 21
+    },
+    {
+      "scenario": "image_tiny",
+      "first_ttft_seconds": 2.635182260069996,
+      "repeat_ttft_median_seconds": 0.17157051153481007,
+      "prompt_tokens": 287
+    },
+    {
+      "scenario": "image_realistic",
+      "first_ttft_seconds": 2.897063749143854,
+      "repeat_ttft_median_seconds": 0.208581060054712,
+      "prompt_tokens": 5027
+    }
+  ],
+  "requests": [
+    {
+      "ttft_seconds": 0.10963424388319254,
+      "total_seconds": 0.21460549184121192,
+      "prompt_tokens": 21,
+      "output_tokens": 8,
+      "scenario": "text_tiny",
+      "repetition": 0
+    },
+    {
+      "ttft_seconds": 0.11857860093005002,
+      "total_seconds": 0.22437532688491046,
+      "prompt_tokens": 21,
+      "output_tokens": 8,
+      "scenario": "text_tiny",
+      "repetition": 1
+    },
+    {
+      "ttft_seconds": 0.11285489285364747,
+      "total_seconds": 0.2189457498025149,
+      "prompt_tokens": 21,
+      "output_tokens": 8,
+      "scenario": "text_tiny",
+      "repetition": 2
+    },
+    {
+      "ttft_seconds": 2.635182260069996,
+      "total_seconds": 2.744414246175438,
+      "prompt_tokens": 287,
+      "output_tokens": 8,
+      "scenario": "image_tiny",
+      "repetition": 0
+    },
+    {
+      "ttft_seconds": 0.17292184219695628,
+      "total_seconds": 0.28162886411882937,
+      "prompt_tokens": 287,
+      "output_tokens": 8,
+      "scenario": "image_tiny",
+      "repetition": 1
+    },
+    {
+      "ttft_seconds": 0.17021918087266386,
+      "total_seconds": 0.2806725378613919,
+      "prompt_tokens": 287,
+      "output_tokens": 8,
+      "scenario": "image_tiny",
+      "repetition": 2
+    },
+    {
+      "ttft_seconds": 2.897063749143854,
+      "total_seconds": 3.0095589151605964,
+      "prompt_tokens": 5027,
+      "output_tokens": 8,
+      "scenario": "image_realistic",
+      "repetition": 0
+    },
+    {
+      "ttft_seconds": 0.20663476502522826,
+      "total_seconds": 0.38346982398070395,
+      "prompt_tokens": 5027,
+      "output_tokens": 8,
+      "scenario": "image_realistic",
+      "repetition": 1
+    },
+    {
+      "ttft_seconds": 0.21052735508419573,
+      "total_seconds": 0.37602976616472006,
+      "prompt_tokens": 5027,
+      "output_tokens": 8,
+      "scenario": "image_realistic",
+      "repetition": 2
+    }
+  ]
+}

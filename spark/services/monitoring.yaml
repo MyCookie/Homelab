@@ -5,16 +5,16 @@ services:
     container_name: prometheus
     restart: unless-stopped
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
+      - --config.file=/etc/prometheus/prometheus.yaml
       - --storage.tsdb.path=/prometheus
       - --storage.tsdb.retention.time=14d
     volumes:
-      - ${VOLUMES_PATH}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${VOLUMES_PATH}/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - ${VOLUMES_PATH}/prometheus/data:/prometheus
     ports:
       - "9090:9090"
     networks:
-      - homelab
+      - spark
 
   # contianer runs as 472:0
   grafana:
@@ -30,6 +30,6 @@ services:
     ports:
       - "3001:3000"
     networks:
-      - homelab
+      - spark
     depends_on:
       - prometheus

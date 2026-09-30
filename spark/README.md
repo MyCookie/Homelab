@@ -10,6 +10,7 @@ LLM inference stack. Runs either the `llamacpp-router` (a single llama.cpp serve
 | --- | --- | --- |
 | `cadvisor` | `cadvisor:8080` | Per-container CPU, memory, network, and block I/O (read from cgroups) |
 | `docker` | `host.docker.internal:9323` | The Docker engine itself |
+| `node` | `host.docker.internal:9100` | The host: filesystems, disk I/O, network interfaces, load |
 
 ### Docker
 
@@ -62,6 +63,14 @@ The `prometheus` service sets `extra_hosts: host.docker.internal:host-gateway` s
 Restarting `dockerd` stops running containers (including whichever model service is up) unless `"live-restore": true` is set in `daemon.json`.
 
 GPU metrics are not covered by either job. Use [dcgm-exporter](https://github.com/NVIDIA/dcgm-exporter) for those.
+
+### Host metrics (node_exporter)
+
+cAdvisor and the engine endpoint only cover containers. The `node-exporter` service covers the host itself.
+
+It runs with `network_mode: host` so per-interface network stats are the host's, not a container's, and with `pid: host` and `/` mounted read-only at `/host` (`--path.rootfs=/host`) so filesystem metrics describe the host's mounts. Because it is on the host network it is not reachable by service name, so Prometheus scrapes it through `host.docker.internal:9100`.
+
+It listens on `0.0.0.0:9100` by default. To limit it to the Docker bridge, add `--web.listen-address=<docker0 address>:9100` to its `command`. See "Binding to `docker0`" for how to find the address.
 
 ### Podman
 

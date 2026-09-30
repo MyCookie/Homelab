@@ -1,0 +1,35 @@
+services:
+  # container runs as 65534:65534
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=14d
+    volumes:
+      - ${VOLUMES_PATH}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${VOLUMES_PATH}/prometheus/data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - homelab
+
+  # contianer runs as 472:0
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ${VOLUMES_PATH}/grafana:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - homelab
+    depends_on:
+      - prometheus

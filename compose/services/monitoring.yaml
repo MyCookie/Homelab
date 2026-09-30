@@ -5,14 +5,31 @@ services:
     container_name: prometheus
     restart: unless-stopped
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
+      - --config.file=/etc/prometheus/prometheus.yaml
       - --storage.tsdb.path=/prometheus
       - --storage.tsdb.retention.time=14d
     volumes:
-      - ${VOLUMES_PATH}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${VOLUMES_PATH}/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - ${VOLUMES_PATH}/prometheus/data:/prometheus
     ports:
       - "9090:9090"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - homelab
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
     networks:
       - homelab
 

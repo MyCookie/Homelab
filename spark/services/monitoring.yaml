@@ -56,7 +56,7 @@ services:
     volumes:
       - ${VOLUMES_PATH}/grafana:/var/lib/grafana
     ports:
-      - "3001:3000"
+      - "3000:3000"
     networks:
       - spark
     depends_on:

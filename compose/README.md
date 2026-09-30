@@ -336,7 +336,36 @@ sudo systemctl restart docker
 curl -s localhost:9323/metrics | head
 ```
 
-Older Docker versions also require `"experimental": true`. To keep the endpoint off the LAN, bind to the `docker0` bridge address (usually `172.17.0.1:9323`) and point the `docker` job at that address instead of `host.docker.internal`.
+Older Docker versions also require `"experimental": true`.
+
+#### Binding to `docker0`
+
+`0.0.0.0` exposes the endpoint on every host interface, including the LAN. To limit it to the Docker bridge, bind to the `docker0` address instead. Find it:
+
+```bash
+ip -4 addr show docker0
+# inet 172.17.0.1/16 ...
+```
+
+Then use that address in `metrics-addr`:
+
+```json
+{
+  "metrics-addr": "172.17.0.1:9323"
+}
+```
+
+After restarting Docker, the endpoint is no longer reachable on `localhost`, so check it on the bridge address:
+
+```bash
+curl -s 172.17.0.1:9323/metrics | head
+```
+
+No change is needed to the `docker` job. `host-gateway` resolves to the `docker0` address by default, so `host.docker.internal:9323` already points at it. If you override `host-gateway-ip` in `daemon.json`, use that address in the job.
+
+If the host firewall (ufw, nftables) drops traffic from Docker networks to the host, allow the Prometheus container's network to reach port 9323 on the `docker0` address.
+
+If `dockerd` fails to start with `cannot assign requested address`, `docker0` did not exist yet when the metrics listener started (for example on a fresh install). Start once with `0.0.0.0:9323`, let Docker create the bridge, then switch to the `docker0` address.
 
 The `prometheus` service sets `extra_hosts: host.docker.internal:host-gateway` so the container can reach a port published on the host.
 

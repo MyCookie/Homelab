@@ -16,7 +16,7 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
     networks:
-      - homelab
+      - spark
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -31,7 +31,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     networks:
-      - homelab
+      - spark
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -56,8 +56,8 @@ services:
     volumes:
       - ${VOLUMES_PATH}/grafana:/var/lib/grafana
     ports:
-      - "3001:3000"
+      - "3000:3000"
     networks:
-      - homelab
+      - spark
     depends_on:
       - prometheus

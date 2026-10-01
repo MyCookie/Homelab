@@ -312,6 +312,106 @@ docker exec --interactive --tty gitlab grep 'Password:' /etc/gitlab/initial_root
 
 See the [documentation](https://docs.gitlab.com/ee/install/docker.html).
 
+## Prometheus
+
+`services/monitoring.yaml` runs Prometheus, Grafana, and cAdvisor. Scrape jobs live in `volumes/prometheus/prometheus.yaml`, which is mounted into the container as `/etc/prometheus/prometheus.yaml`.
+
+| Job | Target | Source |
+| --- | --- | --- |
+| `cadvisor` | `cadvisor:8080` | Per-container CPU, memory, network, and block I/O (read from cgroups) |
+| `docker` | `host.docker.internal:9323` | The Docker engine itself |
+| `node` | `host.docker.internal:9100` | The host: filesystems, disk I/O, network interfaces, load, ZFS ARC |
+
+### Docker
+
+cAdvisor is the `cadvisor` service. The engine endpoint is built into `dockerd` and is off by default. Add it to `/etc/docker/daemon.json` (merge into the existing file if there is one) and restart Docker:
+
+```json
+{
+  "metrics-addr": "0.0.0.0:9323"
+}
+```
+
+```bash
+sudo systemctl restart docker
+curl -s localhost:9323/metrics | head
+```
+
+Older Docker versions also require `"experimental": true`.
+
+#### Binding to `docker0`
+
+`0.0.0.0` exposes the endpoint on every host interface, including the LAN. To limit it to the Docker bridge, bind to the `docker0` address instead. Find it:
+
+```bash
+ip -4 addr show docker0
+# inet 172.17.0.1/16 ...
+```
+
+Then use that address in `metrics-addr`:
+
+```json
+{
+  "metrics-addr": "172.17.0.1:9323"
+}
+```
+
+After restarting Docker, the endpoint is no longer reachable on `localhost`, so check it on the bridge address:
+
+```bash
+curl -s 172.17.0.1:9323/metrics | head
+```
+
+No change is needed to the `docker` job. `host-gateway` resolves to the `docker0` address by default, so `host.docker.internal:9323` already points at it. If you override `host-gateway-ip` in `daemon.json`, use that address in the job.
+
+If the host firewall (ufw, nftables) drops traffic from Docker networks to the host, allow the Prometheus container's network to reach port 9323 on the `docker0` address.
+
+If `dockerd` fails to start with `cannot assign requested address`, `docker0` did not exist yet when the metrics listener started (for example on a fresh install). Start once with `0.0.0.0:9323`, let Docker create the bridge, then switch to the `docker0` address.
+
+The `prometheus` service sets `extra_hosts: host.docker.internal:host-gateway` so the container can reach a port published on the host.
+
+Restarting `dockerd` stops running containers unless `"live-restore": true` is set in `daemon.json`.
+
+### Host metrics (node_exporter)
+
+cAdvisor and the engine endpoint only cover containers. The `node-exporter` service covers the host itself, including the ZFS collector for ARC and pool stats.
+
+It runs with `network_mode: host` so per-interface network stats are the host's, not a container's, and with `pid: host` and `/` mounted read-only at `/host` (`--path.rootfs=/host`) so filesystem metrics describe the host's mounts. Because it is on the host network it is not reachable by service name, so Prometheus scrapes it through `host.docker.internal:9100`.
+
+It listens on `0.0.0.0:9100` by default. To limit it to the Docker bridge, add `--web.listen-address=<docker0 address>:9100` to its `command`. See "Binding to `docker0`" for how to find the address.
+
+### Podman
+
+Podman has no built-in Prometheus endpoint. Use [prometheus-podman-exporter](https://github.com/containers/prometheus-podman-exporter), which reads the Podman API socket and exposes container, pod, image, and volume metrics on port 9882.
+
+Enable the API socket (rootful):
+
+```bash
+sudo systemctl enable --now podman.socket
+```
+
+Run the exporter:
+
+```bash
+sudo podman run -d --name podman-exporter \
+  --user root --security-opt label=disable \
+  -p 9882:9882 \
+  -v /run/podman/podman.sock:/run/podman/podman.sock \
+  -e CONTAINER_HOST=unix:///run/podman/podman.sock \
+  quay.io/navidys/prometheus-podman-exporter
+```
+
+Then add a job to `prometheus.yaml`, using the host address if Prometheus runs elsewhere:
+
+```yaml
+  - job_name: podman
+    static_configs:
+      - targets:
+          - <podman-host>:9882
+```
+
+cAdvisor also works against rootful Podman because it reads cgroups, but container names and labels are less reliable than with the exporter.
+
 ## Pruning
 
 Most of this functionality is now part of Watchtower when running with the `WATCHTOWER_CLEANUP` and `WATCHTOWER_CLEANUP_VOLUMES` environment variables passed. The units are left in this document for reference.

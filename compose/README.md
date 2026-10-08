@@ -303,6 +303,41 @@ services:
       - net_admin
 ```
 
+## Forgejo
+
+Config: `$VOLUMES_PATH/forgejo/data/gitea/conf/app.ini`. Data: `$VOLUMES_PATH/forgejo/data`.
+
+### Upgrading from 11 to 15
+
+The compose file pins `:15`, so any `docker compose up` that recreates Forgejo runs the upgrade. Do the steps below first.
+
+The upgrade guide says to replace the image with the latest release directly. The breaking changes in 12, 13 and 14 still apply.
+
+1. Take a synchronized snapshot of the data directory and the Forgejo database together.
+2. Run `docker exec --user git forgejo forgejo manager flush-queues` (add `--timeout` if it times out).
+3. Run `docker compose up -d forgejo`.
+4. Run `docker exec --user git forgejo forgejo doctor check --all --fix` and `docker exec --user git forgejo forgejo doctor avatar-strip-exif`.
+
+| Release | Change | Action |
+| --- | --- | --- |
+| 12 | Query-string API auth removed; `[security] DISABLE_QUERY_AUTH_TOKEN` controls it | Send tokens in the `Authorization` header |
+| 12 | `POST /repos/{owner}/{repo}/contents` requires `sha` | Update API clients |
+| 13 | Actions workflows validated against a schema | Fix reported errors |
+| 13 | Artifact download URLs use `run_index`; old links break | Update bookmarks |
+| 14 | Startup fails on unexpected keys in the Forgejo-managed `authorized_keys` (checked when `START_SSH_SERVER` is false) | Remove extra keys, or set `[server] SSH_ALLOW_UNEXPECTED_AUTHORIZED_KEYS = true` |
+| 14 | `[security] CSRF_COOKIE_HTTP_ONLY` removed | Delete it from `app.ini` if set |
+| 14 | `GET /api/v1/admin/hooks` is paginated | Update API clients |
+| 14 | Foreign keys on `stopwatch` and `tracked_time` | Run `forgejo doctor check --all --fix` if it reports inconsistencies |
+| 14 | EXIF stripped from uploaded images | Run `forgejo doctor avatar-strip-exif` for existing avatars |
+| 15 | Cookie names unbranded; users must log in again | Optional: `[security] COOKIE_REMEMBER_NAME = gitea_incredible` |
+| 15 | Public-only tokens can't see private repos (404, not 403); admin scope removed | Review token scopes |
+| 15 | Template generation and repo deletion require `write:user` or `write:organization` | Review token scopes |
+| 15 | `repository.pull-request.ADD_CO_COMMITTER_TRAILERS` removed | Delete it from `app.ini` if set |
+| 15 | Webhook secrets and pull-mirror credentials encrypted | Back up `[security] SECRET_KEY`; losing it makes data encrypted with it unreadable |
+| 15 | MariaDB 10.6+ required | None (we run 10.11) |
+
+Full notes: [12](https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/release-notes-published/12.0.0.md), [13](https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/release-notes-published/13.0.0.md), [14](https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/release-notes-published/14.0.0.md), [15](https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/release-notes-published/15.0.0.md). Feature additions are in these notes.
+
 ## Gitlab
 
 To get the root password in the first 24 hours of image creation:
